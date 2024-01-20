@@ -1,0 +1,19 @@
+#export(desc.finalfit)
+export(descriptif)
+export(write.descriptif)
+export(FAIR)
+
+
+
+import(stringr)
+importFrom(purrr, map)
+import(dplyr)
+import(tidyr)
+import(DescTools)
+importFrom(lubridate, is.difftime)
+import(openxlsx)
+import(lazyMe)
+import(manageR)
+import(finalfit)
+import(epiplus)
+importFrom(epiR, epi.conf)

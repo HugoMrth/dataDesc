@@ -1,0 +1,18 @@
+Package: MDBS
+Type: Package
+Title: MDBS
+Version: 0.1.2
+Authors@R: c(
+    person("Hugo", "Marthinet", email = "h.marthinet@gmail.com", role = "cre"),
+    person("Joffrey", "Marchi", email = "joffrey.marchi.cespa@gmail.com", role = "aut"),
+    person("Bakridine", "Mmadi Mrenda", email = "mmadi.cespa@gmail.com", role = "aut"))
+Maintainer: Hugo Marthinet <h.marthinet@gmail.com>
+Description: Ensemble de fonctions metier utlisees dans le service MDBS pour la production.
+License: --------
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
+Imports: DescTools, dplyr, stringr, purrr, tidyr, tools, openxlsx, lazyMe, manageR, finalfit, lubridate, tools, epiplus, epiR
+Author: Hugo Marthinet [cre],
+  Joffrey Marchi [aut],
+  Bakridine Mmadi Mrenda [aut]
