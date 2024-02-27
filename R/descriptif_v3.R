@@ -517,7 +517,7 @@ descriptif <- function(# Arguments de base
       switch(mean.test, # Choix du test sur la moyenne
              test = { # Choix du test par algorithem
                if (bartlett.test(x, y)$p.value >= 0.05 | is.na(bartlett.test(x, y)$p.value)) { # Si bartlett significatif
-                 p <- t.test(x,  as.numeric(y), var.equal = TRUE)$p.value
+                 p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
                  tn <- "Student"
                } else { # Si bartlett non significatif
                  p <- kruskal.test(x, y)$p.value
@@ -525,7 +525,7 @@ descriptif <- function(# Arguments de base
                }
              },
              student = { # test de student
-               p <- t.test(x,  as.numeric(y), var.equal = TRUE)$p.value
+               p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
                tn <- "Student"
              },
              kruskal = { # Kruskal
