@@ -514,24 +514,42 @@ descriptif <- function(# Arguments de base
     res <- bind_cols(list.res)
 
     if (include.p) {
-      switch(mean.test, # Choix du test sur la moyenne
-             test = { # Choix du test par algorithem
-               if (bartlett.test(x, y)$p.value >= 0.05 | is.na(bartlett.test(x, y)$p.value)) { # Si bartlett significatif
-                 p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
-                 tn <- "Student"
-               } else { # Si bartlett non significatif
-                 p <- kruskal.test(x, y)$p.value
-                 if (length(table(y)) == 2) {tn <- "Wilcoxson"} else {tn <- "Kruskal-Wallis"} # Si variable binaire, wilcoxson
-               }
-             },
-             student = { # test de student
-               p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
-               tn <- "Student"
-             },
-             kruskal = { # Kruskal
-               p <- kruskal.test(x, y)$p.value
-               if (length(table(y)) == 2) {tn <- "Wilcoxson"} else {tn <- "Kruskal-Wallis"}
-             })
+switch(mean.test, # Choix du test sur la moyenne
+       test = { # Choix du test par algorithem
+         if (bartlett.test(x, y)$p.value >= 0.05 | is.na(bartlett.test(x, y)$p.value)) { # Si bartlett significatif
+           if (length(table(y)) == 2) {
+             p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
+             tn <- "Student"
+           } else {
+             p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
+             tn <- "Anova"
+           } 
+         } else { # Si bartlett non significatif
+           p <- kruskal.test(x, y)$p.value
+           if (length(table(y)) == 2) {
+             tn <- "Wilcoxson"
+           } else {
+             tn <- "Kruskal-Wallis"
+           }
+         }
+       },
+       student = { # test de student
+         if (length(table(y)) == 2) {
+           p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
+           tn <- "Student"
+         } else {
+           p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
+           tn <- "Anova"
+         } 
+       },
+       kruskal = { # Kruskal
+         p <- kruskal.test(x, y)$p.value
+         if (length(table(y)) == 2) {
+           tn <- "Wilcoxson"
+         } else {
+           tn <- "Kruskal-Wallis"
+         }
+       })
     } else { # Si include.p = FALSE, pas de pval ni de test
       p <- "-"
       tn <- "-"
