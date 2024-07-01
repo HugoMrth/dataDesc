@@ -4,50 +4,50 @@
 \name{describe}
 \alias{describe}
 \description{
-  Compile un descriptif des variables d'un jeu de donnees. Le descriptif peut etre univarie ou bivarie (selon une variable stratifiante).
+  Descriptive analysis of a dataset. Can be univariate of bivariate.
 }\usage{
-  describe(# Arguments de base
+  describe(# Base arguments
             data,
             vars,
             factor,
             label,
             weights,
 
-            # Intervalles de confiance
+            # Confidence interval
             conf.level = 0.95,
             conf.method.cat = c("waldcc", "sisonglaz", "cplus1", "goodman", "wald", "wilson", "boot"),
             conf.method.num = c("classic", "boot"),
 
-            # Variables quanti
+            # Quantitative variables
             prop.type = c("col.percent", "row.percent", "tot.percent"),
             prop.test = c("test", "chi", "fisher"),
             chi.correct = FALSE,
             simulate.p.value = FALSE,
 
-            # Variables quali
+            # Qualitative variables
             num.type = c("mean", "both", "med"),
             mean.test = c("test", "student", "kruskal"),
 
-            # Valeurs manquantes
+            # Missing values
             na.omit = TRUE,
             na.str.default = c("missing", "mode", "value"),
             na.str.value = NULL,
             na.num.default = c("none", "mean", "med", "value"),
             na.num.value = NULL,
 
-            # Taux d'incidence
+            # Incidence rate
             pop.ref = NULL,
 
-            # Décimales
+            # Decimal
             decimal = 1,
             cut.pvalue = 0.001,
 
-            # P-valeur
+            # p-value
             p.decimal = 3,
             p.adjust = FALSE,
             p.adjust.method = c("BH", "holm", "hochberg", "hommel", "bonferroni", "BY", "fdr", "none"),
 
-            # Colonnes à inclure
+            # Columns to include
             include.n = TRUE,
             include.tot = TRUE,
             include.conf = TRUE,
@@ -55,30 +55,28 @@
             include.p = TRUE,
             include.test.name = FALSE,
 
-            # Mise en page
+            # Formatting
             lang = c("fr", "en"),
             merge.cols = TRUE)
 }\arguments{
   \item{data}{
-    Jeu de données sous forme de data frame.
+    A data-frame containing the data. 
 }
   \item{vars}{
-    Noms ou indices des colonnes de \code{data} a decrire.
-    Par défaut toutes les colonnes de \code{data} sont decritent.
+Names or indexes of the columns of \code{data} to describe. By default, every columns are included.
 }
   \item{factor}{
-    Nom ou indice de la variable stratifiante. Si \code{factor = NULL} (par defaut), le descriptif sera univarie, sinon, la valeur doit etre unique.
+Name or index of the factor variable. Must be unique. If \code{factor = NULL} (default), only univariate analysis will be computed. 
 }
   \item{label}{
-    Vecteur de chaînes de caractères qui servira de subsitut de libelles aux variables decrites,
-    doit-être de même longueur que \code{vars}. Par défaut, les labels sont les noms de colonnes.
+Character vector of the names that will substitute the columns names in the output table. Must be the same length as \code{vars}.
+By default, columns names are used.
 }
   \item{weights}{
-    Nom ou indice de la colonne renseignant les poids des individus pour un calcul de moyenne ponderee. Si \code{weights = NULL} (par defaut), aucune pondération ne sera appliquee, sinon, la valeur doit etre unique.
+Name or index of the weight column for the weighted mean calculation. Must be unique. If \code{weights = NULL} (default), no weighting will be done
 }
   \item{conf.level}{
-    La valeur du quantile de l'intervalle. Par défaut \code{conf.level = 0.95}.
-    Doit être compris entre 0 et 1.
+Confidence interval level (default is 0.95). Must be between 0 and 1.
 }
   \item{conf.method.cat}{
     La méthode de calcul de l'intervalle de confiance des proportions.
