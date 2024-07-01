@@ -1,4 +1,4 @@
-descriptif <- function(# Arguments de base
+describe <- function(# Arguments de base
   data,
   vars = NULL,
   factor = NULL,
