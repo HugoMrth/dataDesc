@@ -1,6 +1,6 @@
 #export(desc.finalfit)
-export(descriptif)
-export(write.descriptif)
+export(describe)
+#export(write.descriptif)
 export(FAIR)
 
 
