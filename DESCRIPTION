@@ -7,7 +7,7 @@ Authors@R: c(
     person("Joffrey", "Marchi", email = "joffrey.marchi.cespa@gmail.com", role = "aut"),
     person("Bakridine", "Mmadi Mrenda", email = "mmadi.cespa@gmail.com", role = "aut"))
 Maintainer: Hugo Marthinet <h.marthinet@gmail.com>
-Description: Ensemble de fonctions metier utlisees dans le service MDBS pour la production.
+Description: Exploration and descriptive analysis of a data base.
 License: --------
 Encoding: UTF-8
 LazyData: true
