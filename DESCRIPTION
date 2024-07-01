@@ -1,6 +1,6 @@
-Package: MDBS
+Package: dataDesc
 Type: Package
-Title: MDBS
+Title: dataDesc
 Version: 0.1.2
 Authors@R: c(
     person("Hugo", "Marthinet", email = "h.marthinet@gmail.com", role = "cre"),
