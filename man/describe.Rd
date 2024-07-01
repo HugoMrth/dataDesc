@@ -1,12 +1,12 @@
 \title{
-  Descriptif
+  describe
 }
-\name{descriptif}
-\alias{descriptif}
+\name{describe}
+\alias{describe}
 \description{
   Compile un descriptif des variables d'un jeu de donnees. Le descriptif peut etre univarie ou bivarie (selon une variable stratifiante).
 }\usage{
-  descritif(# Arguments de base
+  describe(# Arguments de base
             data,
             vars,
             factor,
