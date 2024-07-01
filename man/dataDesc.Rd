@@ -1,13 +1,13 @@
-\name{MDBprod-package}
+\name{dataDesc-package}
 
 
-\alias{MDBprod-package}
-\alias{MDBprod}
+\alias{dataDesc-package}
+\alias{dataDesc}
 
 \docType{package}
 
 \title{
-  MDBprod
+  dataDesc
 }
 
 \description{
@@ -16,7 +16,7 @@
 
 \details{
   \tabular{ll}{
-    Package: \tab  MDBprod \cr
+    Package: \tab  dataDesc \cr
     Type: \tab
     Package\cr
     Version: \tab  0.1.0 \cr
