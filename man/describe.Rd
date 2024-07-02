@@ -99,20 +99,21 @@ a Chi-2 test and go onto a Fisher test if the Chi-2 does not converge. Other opt
 to force either of of the two.
 }
   \item{chi.correct}{
-
-    Applique la correction de continuité au test du Chi2. Par défaut \code{chi.correct = FALSE}.
+Enable the \code{correct} argument of the \code{chisq.test} function. Default is \code{chi.correct = TRUE} as in the original method.
 }
   \item{simulate.p.value}{
-    Choix de simuler la p-valeur du test de fisher par la méthode de Monte Carlo.
+Enable the \code{simulate.p.value} argument of the \code{fisher.test} function. Default is \code{simulate.p.value = FALSE} as in the original method.
 }
   \item{num.type}{
-    Choix de compiler la moyenne (\code{quanti = "mean"}), la médiane (\code{quanti = "med"}) ou les deux (\code{quanti = "both"}) dans le cas d'une variable numerique.
-    Par défaut, seule la moyenne est compilee (\code{quanti = "moy"}).
+Choice of which set of descriptive indicators to compute for the numerical variable. Can be either \code{quanti = "mean"}, \code{quanti = "med"} or \code{quanti = "both"}.
+Standard deviation and mean CI95% are associated to the mean, IQR and meadian CI95% are associated to the median.
+When choosing \code{quanti = "both"}, two lines are computed in the output datatable for each numerical variable.
 }
   \item{mean.test}{
-    Type de test pour les moyennes. Par défaut \code{mean.test = "test"},
-    afin de choisir entre le test de Student ou de Kruskal-Wallis selon la vérification d'egalite de variance.
-    Les autres choix sont \code{mean.test = "student"} et \code{mean.test = "kruskal"} afin de forcer un test.
+Choice of which mean test to use. Default method is \code{mean.test = "test"} which will first run a Bartlett test for homoscedasticity,
+then apply either a Student or Kruskal-Wallis test depending on the outcome. 
+Other options are \code{prop.test = "student"} and \code{prop.test = "kruskal"} to force either of of the two.
+When the
     A noter quand dans le cas de l'inegalite de variances avec deux groupes, le test de Wilcoxson est substitué au Kruskal-Wallis.
 }
   \item{na.omit}{
