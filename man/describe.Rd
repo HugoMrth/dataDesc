@@ -113,23 +113,31 @@ When choosing \code{quanti = "both"}, two lines are computed in the output datat
 Choice of which mean test to use. Default method is \code{mean.test = "test"} which will first run a Bartlett test for homoscedasticity,
 then apply either a Student or Kruskal-Wallis test depending on the outcome. 
 Other options are \code{prop.test = "student"} and \code{prop.test = "kruskal"} to force either of of the two.
-When the
-    A noter quand dans le cas de l'inegalite de variances avec deux groupes, le test de Wilcoxson est substitué au Kruskal-Wallis.
+Whenever the factor variable only includes two groups, the Kruskal-Wallis test is substituted to a Wilcoxson test. 
+Whenever there are more than two groups, the Student test in substituted to an Anova test.
 }
   \item{na.omit}{
-  Inclusion des donnees manquantes dans le descriptif. Par defaut \code{na.omit = TRUE} et les donnes manquantes sont ignorees.
+Whether or not missing values should be included in the proportions calculations. Default is \code{na.omit = TRUE} and missing values are ignored.
 }
   \item{na.str.default}{
-    Choix de la methode d'imputation des valeurs manquantes pour les variables qualitatives (pris en compte uniquement si \code{na.omit = FALSE}). Les methodes possibles sont \code{"missing"} (par défaut) pour ajouter une modalité "Valeur manquante", \code{"mode"} pour imputer la modalite la plus frequente, et \code{"value"} pour imputer manuelement une valeur avec l'argument \code{"na.str.value"}.
+Method to use to indent missing datas in categorical variables. Only relevent when \code{na.omit = FALSE}.
+Choices are \code{na.str.default = "missing"} to create a "Missing value" category (default), 
+\code{na.str.default = "mode"} to indent the most represented class and 
+\code{na.str.default = "value"} to choose which value to indent.
+If \code{na.str.default = "value"}, one must then fill up \code{na.str.value} to choose the value.
 }
   \item{na.str.value}{
-    Choix de la valeur par defaut qui remplacera les valeurs manquantes pour les variables qualitatives quand \code{na.str.value = "value"}.
+Value to indent to missing categorical variables whenever \code{na.str.default = "value"}.
 }
   \item{na.num.default}{
-    Choix de la methode d'imputation des valeurs manquantes pour les variables quantitatives (pris en compte uniquement si \code{na.omit = FALSE}). Les methodes possibles sont \code{"none"} (par défaut), qui ne changera rien aux calculs, \code{"moy"} pour imputer la moyenne, \code{"med"} pour imputer la mediane, et \code{"value"} pour imputer manuelement une valeur avec l'argument \code{"na.num.value"}.
+Method to use to indent missing datas in numerical variables. Only relevent when \code{na.omit = FALSE}.
+Default is \code{na.num.default = "none"} which won't affect the mean calcultaion but only change the total number of observations to include the missing values.
+Other choices are \code{na.num.default = "mean"} or \code{na.num.default = "med"} to indent respectivly the mean or median value of the data, 
+and \code{na.num.default = "value"} to choose which value to indent.
+If \code{na.num.default = "value"}, one must then fill up \code{na.num.value} to choose the value.
 }
   \item{na.num.value}{
-    Choix de la valeur par defaut qui remplacera les valeurs manquantes pour les variables quantitatives quand \code{na.num.value = "value"}
+    Value to indent to missing numerical variable whenever \code{na.num.default = "value"}.
 }
   \item{pop.ref}{
     Tableau de donnees contenant les effectifs de references pour calcul des taux d'incidence. La premiere colonne de \code{pop.ref} doit contenir le nom de la variable correpondante dans \code{data}, la deuxieme colonne doit correpondre aux modalites de chaques variable (toutes les modalites doivent etre presentes). Les colonnes suivantes doivent etre nommees selon les niveaux de la variable \code{factor} (inutile si \code{factor = NULL}) et contenir les effectifs dans la population de reference pour chaque modalite de chaque variable. \code{pop.ref}.
