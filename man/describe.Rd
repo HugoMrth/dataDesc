@@ -131,7 +131,7 @@ Value to indent to missing categorical variables whenever \code{na.str.default =
 }
   \item{na.num.default}{
 Method to use to indent missing datas in numerical variables. Only relevent when \code{na.omit = FALSE}.
-Default is \code{na.num.default = "none"} which won't affect the mean calcultaion but only change the total number of observations to include the missing values.
+Default is \code{na.num.default = "none"} which will not affect the mean calcultaion but only change the total number of observations to include the missing values.
 Other choices are \code{na.num.default = "mean"} or \code{na.num.default = "med"} to indent respectivly the mean or median value of the data, 
 and \code{na.num.default = "value"} to choose which value to indent.
 If \code{na.num.default = "value"}, one must then fill up \code{na.num.value} to choose the value.
