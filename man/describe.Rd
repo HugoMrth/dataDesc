@@ -79,25 +79,27 @@ Name or index of the weight column for the weighted mean calculation. Must be un
 Confidence interval level (default is 0.95). Must be between 0 and 1.
 }
   \item{conf.method.cat}{
-    La méthode de calcul de l'intervalle de confiance des proportions.
-    Par défaut \code{conf.method = "waldcc"}.
-    Les autres méthodes sont : \code{"cplus1"}, \code{"goodman"}, \code{"wald"}, \code{"sisonglaz"} et \code{"wilson"}, \code{boot}.
+Method for the proportions confidence interval calculation. 
+Default is \code{conf.method = "waldcc"}, other options are \code{"cplus1"}, \code{"goodman"}, \code{"wald"}, \code{"sisonglaz"} and \code{"wilson"}, \code{boot}.
+
 }
   \item{conf.method.num}{
-    La méthode de calcul de l'intervalle de confiance des moyennes.
-    Par défaut \code{conf.method = "classic"}.
-    L'autres méthodesont : \code{"boot"} calcule l'IC par bootstrap
+    Method for the numerical confidence interval calculation. 
+    Default is \code{conf.method = "classic"}. Other option is \code{"boot"} for a bootstrap estimation.
 }
   \item{prop.type}{
-    Type de pourcentage, en colonne (\code{prop.type = "col.percent"}) en ligne (\code{prop.type = "row.percent"}) ou sur le total
-    (\code{prop.type = "tot.percent"}). Par defaut, les pourcentages sont calcules en colonne.
+Type of the proportions to compile, which correspond to the side of the margins. 
+Can either be \code{prop.type = "col.percent"} for a column total of a 100%, or bottom margin (default), 
+\code{prop.type = "col.percent"} for a row total of a 100%, or right side margin, or \code{prop.type = "tot.percent"} for both
+and a grand total of a 100%.
 }
   \item{prop.test}{
-    Type de test pour les fréquences. Par défaut \code{prop.test = "test"}, effectue d'abord le test du Chi2,
-    puis celui de Fisher si le Chi2 ne convient pas, puis simule le \code{p-value} du test de Fisher si
-    celui-ci ne convient pas. Les autres options sont \code{prop.test = "chi"} et \code{prop.test = "fisher"}.
+Choice of which proportion test to use. Default method is \code{prop.test = "test"} which will first try to run 
+a Chi-2 test and go onto a Fisher test if the Chi-2 does not converge. Other options are \code{prop.test = "chi"} and \code{prop.test = "fisher"}
+to force either of of the two.
 }
   \item{chi.correct}{
+
     Applique la correction de continuité au test du Chi2. Par défaut \code{chi.correct = FALSE}.
 }
   \item{simulate.p.value}{
