@@ -1,28 +1,28 @@
 \title{
-  FAIRification d'un jeu de données
+  FAIRification of a dataset
 }
 \name{FAIR}
 \alias{FAIR}
 \description{
-  Applique un traitement FAIR (findability, accessibility, interoperability, and reusability) sur le jeu de données.
-  Retourne des metadonnées liées aux données, crée un codebook et sauvegarde la sortie dans un fichier .Rdata.
+  Following the FAIR (findability, accessibility, interoperability, and reusability) guidelines, 
+extract metadatas of a data base, create a codebook and save a timestamped version in a .Rdata file.
 }\usage{
   FAIR(data)
 }\arguments{
   \item{data}{
-    Le jeu de données.
+    Data
 }
   \item{id}{
-    Colonne d'identifiants si présente dans le jeu de données.
+    Id column, if present in data.
 }
   \item{save.Rdata}{
-    Choix de sauvegarder le jeu de données et ses métadonnées dans un fichier .Rdata. Par défaut, \code{save.Rdata = FALSE}.
+    Whether or not to save a .Rdata file of the output. Default is \code{save.Rdata = FALSE}.
 }
   \item{print.metadata}{
-    Choix d'ouvrir ou non la description de la sortie dans un nouvel onglet à l'éxécution. Par défaut, \code{print.metadata = TRUE}.
+Should the output be automatically open in the Viewer. Default is \code{print.metadata = TRUE}.
 }
 }\value{
-  Une liste de metadonnées.
+  A list of metadatas and other informations over the data.
 }\author{
   Hugo Marthinet
 }\examples{
