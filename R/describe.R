@@ -11,7 +11,7 @@ describe <- function(# Arguments de base
   # Variables quanti
   prop.type = c("col.percent", "row.percent", "tot.percent"),
   prop.test = c("test", "chi", "fisher"),
-  chi.correct = FALSE,
+  chi.correct = TRUE,
   simulate.p.value = FALSE,
   # Variables quali
   num.type = c("mean", "both", "med"),
