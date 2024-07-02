@@ -137,81 +137,83 @@ and \code{na.num.default = "value"} to choose which value to indent.
 If \code{na.num.default = "value"}, one must then fill up \code{na.num.value} to choose the value.
 }
   \item{na.num.value}{
-    Value to indent to missing numerical variable whenever \code{na.num.default = "value"}.
+Value to indent to missing numerical variable whenever \code{na.num.default = "value"}.
 }
   \item{pop.ref}{
-    Tableau de donnees contenant les effectifs de references pour calcul des taux d'incidence. La premiere colonne de \code{pop.ref} doit contenir le nom de la variable correpondante dans \code{data}, la deuxieme colonne doit correpondre aux modalites de chaques variable (toutes les modalites doivent etre presentes). Les colonnes suivantes doivent etre nommees selon les niveaux de la variable \code{factor} (inutile si \code{factor = NULL}) et contenir les effectifs dans la population de reference pour chaque modalite de chaque variable. \code{pop.ref}.
+Deprecated.
 }
   \item{decimal}{
-    Nombre de decimales des statistiques descriptives, par défaut 1. Les effectifs des tableaux de contingence ne présentent jamais de decimales.
+Number of decimals for the descriptive statistics, default is \code{decimal = 1}. Contingency table frequency are not affected.
 }
   \item{cut.pvalue}{
-    Point de coupure pour controler la valeur minimale affichee pour les p-values. Par défaut \code{cut.pvalue = 0.001} et une p-valeur inferieurs a 0.001 sera notee "<0.001".
+Threshold at which to cut the p-values. Default is \code{cut.pvalue = 0.001} and p-values lesser than 0.001 will appear as \code{<0.001} in the output datatable.
 }
   \item{p.decimal}{
-    Nombre de décimales pour les p-valeurs, par défaut 3.
+Number of decimals for the p-values, default is \code{p.decimal = 3}.
 }
   \item{p.adjust}{
-    Choix d'ajuster les p-valeurs des test par une methode de correction du alpha. Par defaut \code{p.adjust = FALSE}. (Cf. fonction \code{p.ajdust()} pour plus de detail)
+P-values adjustment for multiple comparisons. Default is \code{p.adjust = FALSE} and no adjustement will be conducted.
+See \code{p.ajdust()} for further details.
 }
   \item{p.adjust.method}{
-    Choix de la methode de correction du alpha. Par defaut \code{p.adjust.method = "BH"}, les autres options possibles sont : "holm", "hochberg", "hommel", "bonferroni", "BY", "fdr" et "none". (Cf. fonction \code{p.ajdust()} pour plus de detail)
+Method of p-values adjustment to use. Only applied whenever \code{p.adjust = TRUE}. Default is \code{p.adjust.method = "BH"} for the Benjamini-Hochberg correction, other
+options are \code{p.adjust.method = "holm"}, \code{p.adjust.method = "hochberg"}, \code{p.adjust.method = "hommel"}, \code{p.adjust.method = "bonferroni"}, 
+\code{p.adjust.method = "BY"}, \code{p.adjust.method = "fdr"} and \code{p.adjust.method = "none"}. See \code{p.ajdust()} for further details.
 }
   \item{include.n}{
-    Inclusion de l'effectif de calcul. Par defaut \code{include.n = TRUE}.
+Include the size of the data sample in the output datatable. Default is \code{include.n = TRUE}.
 }
   \item{include.tot}{
-    Inclusion du descriptif sur le total (sans strate). Par défaut \code{include.tot = TRUE}.
+Include the univariate analysis along with the bivariate analysis whenever \code{factor} in filled in. Default is \code{include.tot = TRUE}.
 }
   \item{include.conf}{
-    Inclusion des intervalles de confiance. Par défaut \code{include.conf = TRUE}.
+Include the confidence interval in the output datatable. Default is \code{include.conf = TRUE}.
 }
   \item{include.minmax}{
-    Inclusion minimums et maximums pour les variables quantitatives et du nombre de modalites pour les variables qualitatives. Par défaut \code{include.range = FALSE}.
+Include the minimum and maximum (numerical variables) and number of categories (categorical variables) in the output datatable. Default is \code{include.range = FALSE}.
 }
   \item{include.p}{
-    Inclusion de la p-valeur du test. Par défaut \code{include.p = TRUE}.
+Include the tests p-values in the output datatable. Default is \code{include.p = TRUE}.
 }
   \item{include.test.name}{
-    Inclusion du nom du test effectué. Par défaut \code{include.test.name = FALSE}.
+Include the names of the statistical tests used in the output datatable. Default is \code{include.test.name = FALSE}.
 }
   \item{lang}{
-    Langue du descriptif. Par défaut \code{langue = "fr"},
-    l'autre valeur possible est \code{langue = "en"}.
+Language used to compute the results. Default is french : \code{langue = "fr"}, can also be english \code{langue = "en"}.
 }
   \item{merge.cols}{
-    Concatenation des colonnes de valeurs (effectifs/moyenne, pourcentage/ecart-type et IC). Par défaut \code{merge.cols = TRUE}.
+Merge the three descriptive columns for each factors into one, or let them split into three. Default is \code{merge.cols = TRUE} and only one column contains all of the indicators.
+Output is of the form : \code{mean (sd) [CI95%]}.
 }
 }
 \details{
-  Les fonctions de calcul d'intervalles de confiance (les differents choix de \code{conf.method}) ne se basent pas sur des fonctions preexistantes dans R et les methodes sont directement implementees dans la fonction.
-
-  L'algorithme qui determine le test a effectuer sur les moyennes (\code{mean.test = "test"}) se base sur le resultat du test de bartlett d'egalite des variances, et celui qui determine les test a effectuer sur les tableaux de contingences (\code{prop.test = "test"}) tente en premier lieu un test de Fisher avant d'effectuer un test de Chi-2 sur le test de Fisher n'aboutit pas. Les arguments \code{chi.correct} et \code{simulate.p.value} sont directement herites aux fonctions de test de Fisher et de Chi-2.
-
-  Les methodes d'ajustement du alpha sont directement appliquees a la fonction \code{p.adjust}.
+Tests and p-value adjustment are computed using existing functions from base R (see the seealso section for further details). 
+Confidence interval calculations however are directly implemented in this function and do not refer to any existing R functions. 
+The algorithms used to choose which test to conduct are based on my own practice.
 }
 \value{
 }
 \author{
-  Joffrey Marchi & Hugo Marthinet
+  Hugo Marthinet
 }
 \seealso{
-  \code{\link{write.descriptif}}
+  \code{\link{chisq.test}}, \code{\link{fisher.test}}, \code{\link{kruskal.test}}, \code{\link{wilcox.test}}, \code{\link{t.test}}, \code{\link{anova}},
+\code{\link{p.adjust}}
 }
 \examples{
-  # Exemple de configuration pour un descriptif univarié complet
+  # Full univariate descriptive analysis
   descriptif(data = iris,
            num.type = "both",
            decimal = 2,
            include.minmax = TRUE,
            merge.cols = FALSE)
 
-  # Exemple de configuration minimale pour un descriptif bivarie
+  # Minimalist bivariate analysis
   descriptif(data = tab::tabdata,
            factor = "Group",
            vars = c("Age", "Sex", "Race", "BMI"))
 
-  # Meme chose avec un accent sur les tests
+  # Focus on changes in the statistical testing
   descriptif(data = tab::tabdata,
            factor = "Group",
            vars = c("Age", "Sex", "Race", "BMI"),
@@ -219,17 +221,4 @@ If \code{na.num.default = "value"}, one must then fill up \code{na.num.value} to
            include.test.name = TRUE, include.tot = FALSE, include.n = FALSE,
            cut.pvalue = 0.0001,
            p.adjust = TRUE, p.adjust.method = "bonferroni")
-
-  # Exemple d'utilisation de l'argument pop.ref pour un calcul de taux
-  # Les colonnes 'male' et 'female' correspondent aux modalites de "gender" dans le jeu de donnees BEPS
-  pop <- data.frame(
-    Var = c(rep("vote", 3), rep("gender", 2)),
-    Mod = c("Liberal Democrat", "Labour", "Conservative", "male", "female"),
-    male = c(150000, 85000, 65000, 225000, 75000),
-    female = c(10000, 5000, 6000, 22000, 7000)
-  )
-  descriptif(data = carData::BEPS,
-             vars = c("vote", "gender", "age"),
-             factor = "gender",
-             pop.ref = pop)
 }
