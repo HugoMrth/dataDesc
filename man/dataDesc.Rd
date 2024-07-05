@@ -11,7 +11,7 @@
 }
 
 \description{
-  Ensemble de fonctions metier utlisees dans le service MDBS pour la production.
+  Data descriptions tools
 }
 
 \details{
@@ -37,10 +37,10 @@
 }
 
 \seealso{
-  Autres packages developpes au CESPA :
+  Other packages by the same author :
 
   \code{\link{epiplus}}, \code{\link{lazyMe}}, \code{\link{manageR}},
-  \code{\link{surveyscores}}, \code{\link{NSN}}
+  \code{\link{surveyscores}}, \code{\link{sampleSize}}
 }
 
 \examples{
