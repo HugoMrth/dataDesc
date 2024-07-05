@@ -5,7 +5,7 @@ Version: 0.1.2
 Authors@R: c(
     person("Hugo", "Marthinet", email = "h.marthinet@gmail.com", role = "cre")
 Maintainer: Hugo Marthinet <h.marthinet@gmail.com>
-Description: Exploration and descriptive analysis of a data base.
+Description: Data description tools
 License: --------
 Encoding: UTF-8
 LazyData: true
