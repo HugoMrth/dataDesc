@@ -4,7 +4,7 @@ FAIR <- function(data,
                  print.metadata = TRUE) {
   #### Check Params ####
   if (is.null(data)) {
-    stop("data manquant")
+    stop("data missing")
   }
 
   #### Code Fonction ####
