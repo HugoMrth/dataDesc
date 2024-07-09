@@ -89,9 +89,9 @@ Default is \code{conf.method = "waldcc"}, other options are \code{"cplus1"}, \co
 }
   \item{prop.type}{
 Type of the proportions to compile, which correspond to the side of the margins. 
-Can either be \code{prop.type = "col.percent"} for a column total of a 100%, or bottom margin (default), 
-\code{prop.type = "col.percent"} for a row total of a 100%, or right side margin, or \code{prop.type = "tot.percent"} for both
-and a grand total of a 100%.
+Can either be \code{prop.type = "col.percent"} for a column total of a 100percent, or bottom margin (default), 
+\code{prop.type = "col.percent"} for a row total of a 100percent, or right side margin, or \code{prop.type = "tot.percent"} for both
+and a grand total of a 100percent.
 }
   \item{prop.test}{
 Choice of which proportion test to use. Default method is \code{prop.test = "test"} which will first try to run 
@@ -106,7 +106,7 @@ Enable the \code{simulate.p.value} argument of the \code{fisher.test} function. 
 }
   \item{num.type}{
 Choice of which set of descriptive indicators to compute for the numerical variable. Can be either \code{quanti = "mean"}, \code{quanti = "med"} or \code{quanti = "both"}.
-Standard deviation and mean CI95% are associated to the mean, IQR and meadian CI95% are associated to the median.
+Standard deviation and mean CI95percent are associated to the mean, IQR and meadian CI95percent are associated to the median.
 When choosing \code{quanti = "both"}, two lines are computed in the output datatable for each numerical variable.
 }
   \item{mean.test}{
@@ -183,7 +183,7 @@ Language used to compute the results. Default is french : \code{langue = "fr"}, 
 }
   \item{merge.cols}{
 Merge the three descriptive columns for each factors into one, or let them split into three. Default is \code{merge.cols = TRUE} and only one column contains all of the indicators.
-Output is of the form : \code{mean (sd) [CI95%]}.
+Output is of the form : \code{mean (sd) [CI95percent]}.
 }
 }
 \details{
