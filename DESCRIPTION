@@ -2,8 +2,7 @@ Package: dataDesc
 Type: Package
 Title: dataDesc
 Version: 0.1.2
-Authors@R: c(
-    person("Hugo", "Marthinet", email = "h.marthinet@gmail.com", role = "cre")
+Authors@R: person("Hugo", "Marthinet", email = "h.marthinet@gmail.com", role = "cre")
 Maintainer: Hugo Marthinet <h.marthinet@gmail.com>
 Description: Data description tools
 License: --------
