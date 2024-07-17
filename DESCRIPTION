@@ -9,5 +9,5 @@ License: --------
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
-Imports: DescTools, dplyr, stringr, purrr, tidyr, tools, openxlsx, lazyMe, manageR, finalfit, lubridate, tools, epiplus, epiR, rstatix
+Imports: DescTools, dplyr, stringr, purrr, tidyr, tools, openxlsx, lazyMe, manageR, lubridate, tools, epiplus, epiR, rstatix
 Author: Hugo Marthinet [cre]
