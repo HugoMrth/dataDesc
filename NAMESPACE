@@ -2,6 +2,7 @@
 export(describe)
 #export(write.descriptif)
 export(FAIR)
+export(describeTidy)
 
 
 
