@@ -40,7 +40,8 @@ describe <- function(# Arguments de base
   include.test.name = FALSE,
   # Mise en page
   lang = c("fr", "en"),
-  merge.cols = TRUE) {
+  merge.cols = TRUE,
+  big.mark = " ") {
 
   options(warn = 1) # Warnings on
 
@@ -1063,6 +1064,16 @@ switch(mean.test, # Choix du test sur la moyenne
   if (!include.test.name) res <- res[, colnames(res) != "test"] # Suppression de la colonne de test
   if (is.null(pop.ref)) res <- res[, !(substr(colnames(res), nchar(colnames(res))-1, nchar(colnames(res))) == "TI")] # Suppression de la p-valeur
 
+  if (!is.null(big.mark)) {
+    res[, 2:ncol(res)] <- apply(res[, 2:ncol(res)], 2, function(x) {
+      x <- str_replace_all(x, ",", ".")
+      x <- ifelse(nchar(sub("\\ .*", "", x)) > 0,
+                  paste(prettyNum(as.numeric(sub("\\ .*", "", x)), big.mark = big.mark), sub("^[^_]* ", "", x)),
+                  x)
+      x <- str_replace_all(x, "\\.", ",")
+    })
+  }
+                        
   return(as.data.frame(res))
 }
 
