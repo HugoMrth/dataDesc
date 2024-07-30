@@ -57,7 +57,8 @@
 
             # Formatting
             lang = c("fr", "en"),
-            merge.cols = TRUE)
+            merge.cols = TRUE,
+            big.mark = " ")
 }\arguments{
   \item{data}{
     A data-frame containing the data. 
@@ -184,6 +185,9 @@ Language used to compute the results. Default is french : \code{langue = "fr"}, 
   \item{merge.cols}{
 Merge the three descriptive columns for each factors into one, or let them split into three. Default is \code{merge.cols = TRUE} and only one column contains all of the indicators.
 Output is of the form : \code{mean (sd) [CI95percent]}.
+}
+  \item{big.mark}{
+  Character; if not \code{NULL} used as mark between every big interval decimals before the decimal point.
 }
 }
 \details{
