@@ -2,13 +2,14 @@ describeTidy <- function(desc.object) {
   i <- 2
   n <- 0
   # Suppressing Oui/Non lines to shorten the table
-  while (i < nrow(desc.object)) {
+  while (i < (nrow(desc.object))) {
     # Oui/non double lines detection
     # making sure ther's nothing after
-    if ((desc.object[i, 1] == "  Non" & desc.object[i+1, 1] == "  Oui" & substr(desc.object[i+2, 1], 1, 2) != "  ") |
-      (desc.object[i, 1] == "  Oui" & desc.object[i+1, 1] == "  Non" & substr(desc.object[i+2, 1], 1, 2) != "  ") | 
-      (desc.object[i, 1] == "  Yes" & desc.object[i+1, 1] == "  No" & substr(desc.object[i+2, 1], 1, 2) != "  ") |
-      (desc.object[i, 1] == "  No" & desc.object[i+1, 1] == "  Yes" & substr(desc.object[i+2, 1], 1, 2) != "  ") ) {
+    if (((desc.object[i, 1] == "  Non" & desc.object[i+1, 1] == "  Oui" ) |
+        (desc.object[i, 1] == "  Oui" & desc.object[i+1, 1] == "  Non") | 
+      (desc.object[i, 1] == "  Yes" & desc.object[i+1, 1] == "  No") |
+      (desc.object[i, 1] == "  No" & desc.object[i+1, 1] == "  Yes")) & 
+      ifelse(i+1 == nrow(desc.object), TRUE, substr(desc.object[i+2, 1], 1, 2) != "  ")) {
       # replacing empty line with the data
       ifelse(desc.object[i, 1] == "  Oui" | desc.object[i, 1] == "  Yes",
              desc.object[i-1, 2:ncol(desc.object)] <- desc.object[i, 2:ncol(desc.object)],
