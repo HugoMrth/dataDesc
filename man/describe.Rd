@@ -192,8 +192,14 @@ Output is of the form : \code{mean (sd) [CI95percent]}.
 }
 \details{
 Tests and p-value adjustment are computed using existing functions from base R (see the seealso section for further details). 
-Confidence interval calculations however are directly implemented in this function and do not refer to any existing R functions. 
-The algorithms used to choose which test to conduct are based on my own practice.
+Confidence interval calculations however are directly implemented in this function and do not refer to any existing R functions.  \cr
+
+The algorithm used to choose which tests to conduct are based on my own practice, 
+that is choosing between Fisher and Chi-2 tests for a difference in proportions (based on frequencies in the contingency table)
+and choosing between Student and Wilcoxson/Kruskal-Wallis tests for a difference in mean (based on the outcome of the Bartlett test for heteroscedasticity). \cr
+
+Unrepresented factor levels can be taken into account in the analysis (line being displayed even tho N=0), 
+but the variable has to be a factor with the levels being assigned accordingly. This will not work with character vectors.
 }
 \value{
 }
