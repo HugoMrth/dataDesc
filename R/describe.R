@@ -41,7 +41,7 @@ describe <- function(# Arguments de base
   # Mise en page
   lang = c("fr", "en"),
   merge.cols = TRUE,
-  big.mark = " ") {
+  big.mark = NULL) {
 
   options(warn = 1) # Warnings on
 
@@ -1063,7 +1063,8 @@ switch(mean.test, # Choix du test sur la moyenne
   if (!include.n) res <- res[, colnames(res) != "N"] # Suppresion du N total
   if (!include.test.name) res <- res[, colnames(res) != "test"] # Suppression de la colonne de test
   if (is.null(pop.ref)) res <- res[, !(substr(colnames(res), nchar(colnames(res))-1, nchar(colnames(res))) == "TI")] # Suppression de la p-valeur
-
+  if (is.null(pop.ref)) res <- res[, !(str_detect(colnames(res), "TI IC 95"))]
+                                
   if (!is.null(big.mark)) {
     res[, 2:ncol(res)] <- apply(res[, 2:ncol(res)], 2, function(x) {
       x <- str_replace_all(x, ",", ".")
