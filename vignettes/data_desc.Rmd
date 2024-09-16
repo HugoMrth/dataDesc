@@ -37,19 +37,19 @@ the upside lies in a variety of layout parameters.
 
 Basic descriptive analysis of the whole dataset can be conducted simple calling the **describe** function and providing the dataset as the only parameter :
 
-```{r, echo = FALSE, message = FALSE}
+```{r,echo = FALSE, message = FALSE}
 describe(iris)
 ```
 
 One can also select the columns to describe, and provide new labels :
 
-```{r, echo = FALSE, message = FALSE}
+```{r, message = FALSE}
 describe(iris, vars = 1:2, label = c("Length", "Width"), lang = "en")
 ```
 
 Other arguments mainly allow control over the layout :
 
-```{r, echo = FALSE, message = FALSE}
+```{r, message = FALSE}
 describe(iris, vars = 1:2, label = c("Length", "Width"), lang = "en",
          merge.cols = FALSE, include.conf = FALSE)
 ```
@@ -58,7 +58,7 @@ describe(iris, vars = 1:2, label = c("Length", "Width"), lang = "en",
 
 Bivariate analysis can be easily compuetd using the **factor** parameter. Statistical testing will then be added to the descriptive table.
 
-```{r, echo = FALSE, message = FALSE}
+```{r, message = FALSE}
 describe(iris, vars = 1:2, factor = 5, label = c("Length", "Width"), lang = "en",
          merge.cols = FALSE, include.conf = FALSE, include.test.name = TRUE)
 ```
