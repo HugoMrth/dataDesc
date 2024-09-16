@@ -2,7 +2,6 @@
 title: "<h1 style='text-align:center;'> Descriptive analysis </h1>"
 author: "Hugo Marthinet"
 date: "`r Sys.Date()`"
-link-citations: yes
 output:
   knitr:::html_vignette:
   toc: true
@@ -27,6 +26,7 @@ vignette: >
 
 knitr::opts_chunk$set(collapse = T, comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
+library(dataDesc)
 ```
 
 The goal of this packages is solely to provide an easy way to compute a descriptive analysis up to publication standards. 
@@ -37,7 +37,7 @@ the upside lies in a variety of layout parameters.
 
 Basic descriptive analysis of the whole dataset can be conducted simple calling the **describe** function and providing the dataset as the only parameter :
 
-```{r,echo = FALSE, message = FALSE}
+```{r, message = FALSE}
 describe(iris)
 ```
 
@@ -56,7 +56,7 @@ describe(iris, vars = 1:2, label = c("Length", "Width"), lang = "en",
 
 ## Bivariate analysis
 
-Bivariate analysis can be easily compuetd using the **factor** parameter. Statistical testing will then be added to the descriptive table.
+Bivariate analysis can be easily computed using the **factor** parameter. Statistical testing will then be added to the descriptive table.
 
 ```{r, message = FALSE}
 describe(iris, vars = 1:2, factor = 5, label = c("Length", "Width"), lang = "en",
