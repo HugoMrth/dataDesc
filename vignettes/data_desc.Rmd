@@ -1,19 +1,64 @@
 ---
-title: "data_desc"
-output: rmarkdown::html_vignette
+title: "<h1 style='text-align:center;'> Descriptive analysis </h1>"
+author: "Hugo Marthinet"
+date: "`r Sys.Date()`"
+link-citations: yes
+output:
+  knitr:::html_vignette:
+  toc: true
 vignette: >
-  %\VignetteIndexEntry{data_desc}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Descriptive analysis}
+  %\usepackage[utf8]{inputenc}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+\setmainfont{Calibri Light}
+
+```{r, echo = FALSE, message = FALSE}
+
+# If you want to create a PDF document paste the following after line 9 above:
+#   pdf_document:
+#     toc: true
+#     highlight: tango
+#     number_sections: no
+#     latex_engine: xelatex    
+# header-includes: 
+#    - \usepackage{fontspec}
+
+knitr::opts_chunk$set(collapse = T, comment = "#>")
+options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
-```{r setup}
-library(dataDesc)
+The goal of this packages is solely to provide an easy way to compute a descriptive analysis up to publication standards. 
+The calculations do not differ from the descriptive analysis provided by other packages such as **gtsummary** or **tableone**, 
+the upside lies in a variety of layout parameters. 
+
+## Univariate analysis
+
+Basic descriptive analysis of the whole dataset can be conducted simple calling the **describe** function and providing the dataset as the only parameter :
+
+```{r, echo = FALSE, message = FALSE}
+describe(iris)
+```
+
+One can also select the columns to describe, and provide new labels :
+
+```{r, echo = FALSE, message = FALSE}
+describe(iris, vars = 1:2, label = c("Length", "Width"), lang = "en")
+```
+
+Other arguments mainly allow control over the layout :
+
+```{r, echo = FALSE, message = FALSE}
+describe(iris, vars = 1:2, label = c("Length", "Width"), lang = "en",
+         merge.cols = FALSE, include.conf = FALSE)
+```
+
+## Bivariate analysis
+
+Bivariate analysis can be easily compuetd using the **factor** parameter. Statistical testing will then be added to the descriptive table.
+
+```{r, echo = FALSE, message = FALSE}
+describe(iris, vars = 1:2, factor = 5, label = c("Length", "Width"), lang = "en",
+         merge.cols = FALSE, include.conf = FALSE, include.test.name = TRUE)
 ```
