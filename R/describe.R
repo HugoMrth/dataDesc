@@ -1069,7 +1069,9 @@ switch(mean.test, # Choix du test sur la moyenne
     res[, 2:ncol(res)] <- apply(res[, 2:ncol(res)], 2, function(x) {
       x <- str_replace_all(x, ",", ".")
       x <- ifelse(nchar(sub("\\ .*", "", x)) > 0,
-                  paste(prettyNum(as.numeric(sub("\\ .*", "", x)), big.mark = big.mark), sub("^[^_]* ", "", x)),
+                  ifelse(str_detect(x, " "),
+                         paste(prettyNum(as.numeric(sub("\\ .*", "", x)), big.mark = big.mark), sub("^[^_]* ", "", x)),
+                         prettyNum(as.numeric(sub("\\ .*", "", x)), big.mark = big.mark)),
                   x)
       x <- str_replace_all(x, "\\.", ",")
     })
