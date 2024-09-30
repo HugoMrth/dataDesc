@@ -135,11 +135,11 @@ describe <- function(# Arguments de base
   if (chi.correct %ni% c(TRUE, FALSE)) {
     warning("chi.correct must be logical (TRUE, FALSE), default value is assigned : chi.correct <- FALSE")
     chi.correct <- FALSE}
+  if (!is.numeric(decimal)) decimal <- as.numeric(decimal)
   if (floor(decimal) != decimal || decimal < 0) {
     warning("decimal must be a positive integer, default value is assigned : decimal <- 1")
     decimal <- 1}
-  if (!is.integer(decimal)) decimal <- as.numeric(decimal)
-  if (cut.pvalue >= 1 && cut.pvalue < 0) {
+  if (cut.pvalue >= 1 | cut.pvalue < 0) {
     warning("cut.pvalue must be between 0 and 1, default value is assigned : cut.pvalue <- 0.001")
     cut.pvalue <- 0.001}
   if (p.adjust %ni% c(TRUE, FALSE)) {
@@ -163,6 +163,9 @@ describe <- function(# Arguments de base
   if (include.minmax %ni% c(TRUE, FALSE)) {
     warning("include.minmax must be logical (TRUE, FALSE), default value is assigned : include.minmax <- FALSE")
     include.minmax <- FALSE}
+  if (include.test.name %ni% c(TRUE, FALSE)) {
+    warning("include.test.name must be logical (TRUE, FALSE), default value is assigned : include.test.name <- FALSE")
+    include.test.name <- FALSE}
 
   # Conversion en entier des params
   decimal <- as.integer(decimal)
@@ -182,7 +185,7 @@ describe <- function(# Arguments de base
     #Calcul de l'IC et de la mediane
     r <- switch(match.arg(arg = conf.method.num, choices = c("classic", "boot")),
                 classic = test_binom_med(x, conf.level = conf.level)$conf.int,  # Si methode de calcul classique
-                boot = boot.ci(boot(x, function(x, d) median(x[d], na.rm = na.rm), R = R),
+                boot = boot.ci(boot::boot(x, function(x, d) median(x[d], na.rm = na.rm), R = R),
                                conf = conf.level, type = "basic")[[4]][4:5]) # Si calcul par bootstrap
     med <- median(x, na.rm = na.rm)
 
@@ -260,7 +263,7 @@ describe <- function(# Arguments de base
            boot = {
              btype <- InDots(..., arg = "type", default = "basic")
              if (trim != 0) {
-               boot.fun <- boot(x, function(x, i) { # Fonction retournant moyenne et variance?
+               boot.fun <- boot::boot(x, function(x, i) { # Fonction retournant moyenne et variance?
                  m <- mean(x[i], na.rm = FALSE, trim = trim)
                  n <- length(i)
                  v <- winvar(x, trim)/((1 - 2 * trim) * sqrt(length(x)))^2
@@ -268,7 +271,7 @@ describe <- function(# Arguments de base
                }, R = InDots(..., arg = "R", default = 999), parallel = InDots(..., arg = "parallel", default = "no"))
              }
              else {
-               boot.fun <- boot(x, function(x, i) { # Fonction retournant moyenne et variance?
+               boot.fun <- boot::boot(x, function(x, i) { # Fonction retournant moyenne et variance?
                  m <- mean(x[i], na.rm = FALSE)
                  n <- length(i)
                  v <- (n - 1) * var(x[i])/n^2
@@ -411,7 +414,7 @@ describe <- function(# Arguments de base
                tab
              }
 
-             boot.out <- boot( dt , function(.x,d){ (.x[d] %>% table/n)  }  , R = 999)
+             boot.out <- boot::boot( dt , function(.x,d){ (.x[d] %>% table/n)  }  , R = 999)
              if ( sum(x!=0) == 1) {
                res = tibble(est = x/n , lwr.ci= x/n, upr.ci = x/n)
              } else {
@@ -524,7 +527,7 @@ switch(mean.test, # Choix du test sur la moyenne
            } else {
              p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
              tn <- "Anova"
-           } 
+           }
          } else { # Si bartlett non significatif
            p <- kruskal.test(x, y)$p.value
            if (length(table(y)) == 2) {
@@ -541,7 +544,7 @@ switch(mean.test, # Choix du test sur la moyenne
          } else {
            p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
            tn <- "Anova"
-         } 
+         }
        },
        kruskal = { # Kruskal
          p <- kruskal.test(x, y)$p.value
@@ -1009,7 +1012,11 @@ switch(mean.test, # Choix du test sur la moyenne
       for (i in 1:length(ind_c)) { # Boucle sur les nombres de modalites + 1 (total)
         res[, ind_c[i]] <- paste(res[, ind_c[i]], res[, ind_c[i] + 1]) # Fusion des 2 colonnes
         if (ncol_suppr == 2) res[, ind_c[i]] <- paste(res[, ind_c[i]], res[, ind_c[i] + 2]) # Et une deuxième fois si besoin
-        if (include.conf) colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[IC95%]") # Ajout dans le nom de colonnes
+
+        if (include.conf) {
+          if (lang == "fr") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[IC95%]") # Ajout dans le nom de colonnes
+          if (lang == "en") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[CI95%]") # Ajout dans le nom de colonnes
+        }
         if (include.minmax) colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "{minmax}") # Idem
       }
       res <- res[, -as.vector(sapply(ind_c, `+`, 1:ncol_suppr))] # Suppression des colonnes concatenees
@@ -1021,7 +1028,9 @@ switch(mean.test, # Choix du test sur la moyenne
       ind_c <- which(str_detect(colnames(res), " TI") & !str_detect(colnames(res), "TI IC|TI CI")) # Indice des colonnes de depart pour la fusion
       for (i in 1:length(ind_c)) { # Boucle sur les nombres de modalites + 1 (total)
         res[, ind_c[i]] <- paste(res[, ind_c[i]], res[, ind_c[i] + 1]) # Fusion des 2 colonnes
-        colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[IC95% TI]") # Renommage de la colonne
+        if (lang == "fr") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[IC95% TI]") # Renommage de la colonne
+        if (lang == "en") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[CI95% TI]") # Renommage de la colonne
+
       }
       res <- res[, -ncol_suppr] # Suppression des colonnes d'IC apres fusion
     }
@@ -1064,7 +1073,9 @@ switch(mean.test, # Choix du test sur la moyenne
   if (!include.test.name) res <- res[, colnames(res) != "test"] # Suppression de la colonne de test
   if (is.null(pop.ref)) res <- res[, !(substr(colnames(res), nchar(colnames(res))-1, nchar(colnames(res))) == "TI")] # Suppression de la p-valeur
   if (is.null(pop.ref)) res <- res[, !(str_detect(colnames(res), "TI IC 95"))]
-                                
+  if (is.null(pop.ref)) res <- res[, !(str_detect(colnames(res), "TI CI 95"))]
+  colnames(res) <- str_replace_all(colnames(res), "95% 95%", "95%")
+
   if (!is.null(big.mark)) {
     res[, 2:ncol(res)] <- apply(res[, 2:ncol(res)], 2, function(x) {
       x <- str_replace_all(x, ",", ".")
@@ -1076,246 +1087,6 @@ switch(mean.test, # Choix du test sur la moyenne
       x <- str_replace_all(x, "\\.", ",")
     })
   }
-                        
+
   return(as.data.frame(res))
 }
-
-
-# library(useFull)
-# library(tab)
-# library(lubridate)
-# library(stringr)
-# library(tidyr)
-# library(dplyr)
-
-#descriptif(data = tabdata, factor = "Group", vars = c("Age", "Sex", "Race", "BMI"))
-#descriptif(data = tabdata, factor = "Groc("#FFBBFF", "#FFFFFF", "#FFFFFF")up", vars = c("Sex"))
-#descriptif_map_fun(factor = tabdata$Group, vars = tabdata$Sex)
-# descriptif(data = tabdata, factor = "Group",
-#            vars = c("Age", "Sex", "Race", "BMI"),
-#            prop.test = "fisher")
-
-
-#### Tests param : mean.test ####
-  # descriptif(data = tabdata, factor = "Group", vars = c("Age", "Sex", "Race", "BMI"))
-  # descriptif(data = tabdata, factor = "Group", vars = c("Age", "Sex", "Race", "BMI"),
-  #            mean.test = "wilcox", prop.test = "fisher")
-  # descriptif(iris, factor = 5, vars = 1:4,
-  #            mean.test = "student", cut.pvalue = 0.00000000000001)
-  # descriptif(iris, factor = 5, vars = 1:4,
-  #            mean.test = "wilcox", cut.pvalue = 0.00000000000001)
-
-
-#### Tests une seule var + colonne type de test ####
-  # descriptif(data = iris,
-  #            factor = "Species",
-  #            vars = 1)
-  # descriptif(data = iris,
-  #            factor = "Species",
-  #            num.type = "both",
-  #            mean.test = "wilcox",
-  #            vars = 1)
-  # descriptif(data = iris,
-  #            factor = "Species",
-  #            num.type = "both",
-  #            mean.test = "student",
-  #            var.equal = "test",
-  #            vars = 1)
-
-
-
-#### Test params : include.qqchose ####
-  # var_vars <- 1:4
-  # descriptif(data = iris, factor = "Species", vars = var_vars,
-  #            include.test.name = TRUE)
-  # descriptif(data = iris, factor = "Species", vars = var_vars,
-  #            num.type = "both",
-  #            include.test.name = TRUE, include.n = FALSE, include.tot = FALSE)
-  # descriptif(data = iris, factor = "Species", vars = var_vars,
-  #            num.type = "both",
-  #            include.test.name = FALSE, include.n = FALSE, include.tot = TRUE)
-  # descriptif(data = iris, factor = "Species", vars = var_vars,
-  #            num.type = "both", mean.test = "kruskal",
-  #            include.test.name = TRUE, include.n = FALSE, include.tot = FALSE, include.conf = FALSE)
-
-
-
-# #### Test param : prop.test ####
-  # TO <- tableone::CreateTableOne(data = tabdata, vars = c("Age", "BMI"), strata = "Group")
-  #
-  # kruskal.test(tabdata$Group, tabdata$Age)
-  # kruskal.test(tabdata$Group, tabdata$BMI)
-  #
-  # print(TO)
-  # print(TO, nonnormal = c("Age", "BMI"))
-  #
-  # descriptif(data = tabdata, factor = "Group", vars = c("Age", "BMI"),
-  #            include.test.name = TRUE , mean.test = "kruskal")
-  # descriptif(data = tabdata, factor = "Group", vars = c("Age", "BMI"),
-  #            include.test.name = TRUE , num.type = "med")
-
-
-
-# #### Tests ponderation ####
-  # descriptif(iris, 1:4, 5)
-  #
-  # #Pour du numerique
-  # iris2 <- cbind(iris, we = c(rep(0.90, 75), rep(1.05, 75)))
-  # descriptif(iris2, 1:4, 5, weights = 6)
-  # #Pour des facteurs
-  # library(tab)
-  # head(tabdata)
-  # descriptif(tabdata, "Sex", "Race")
-  #
-  # tabdata2 <- cbind(tabdata, we = c(rep(0.90, 75), rep(1.05, 75), rep(0.90, 75), rep(1.05, 75)))
-  # tabdata2$we[is.na(tabdata2$Race)] <- NA
-  # descriptif(tabdata2, "Sex", "Race", weights = "we")
-
-
-
-#### Tests param : merge.cols (avec include.conf) ####
-  # descriptif(iris, 1:4, 5, merge.cols = FALSE, include.conf = FALSE)
-  # descriptif(iris, 1:4, 5, merge.cols = FALSE, include.conf = TRUE )
-  # descriptif(iris, 1:4, 5, merge.cols = TRUE,  include.conf = TRUE )
-  # descriptif(iris, 1:4, 5, merge.cols = TRUE,  include.conf = FALSE)
-  # descriptif(iris, 1:4, 5, merge.cols = FALSE, include.conf = FALSE, include.test.name = TRUE)
-  # descriptif(iris, 1:4, 5, merge.cols = FALSE, include.conf = TRUE , include.test.name = TRUE)
-  # descriptif(iris, 1:4, 5, merge.cols = TRUE,  include.conf = TRUE , include.test.name = TRUE)
-  # descriptif(iris, 1:4, 5, merge.cols = TRUE,  include.conf = FALSE, include.test.name = TRUE)
-
-  # descriptif(iris, 1:4, 5, merge.cols = FALSE, include.conf = TRUE , include.p = FALSE)
-  # descriptif(iris, 1:4, 5, merge.cols = FALSE, include.conf = TRUE , include.p = FALSE, include.test.name = TRUE)
-
-
-#### Test include.p = FALSE ####
-  # iris2 <- cbind(iris, Species2 = paste0(iris$Species, rep(c(rep(1:16, each = 3), 17, 17), each = 3)))
-  # descriptif(iris2, "Species2", 1:4)
-  # descriptif(iris2, "Species2", 1:4, include.p = FALSE)
-
-
-  # library(useFull)
-  # descriptif(iris, 1:4, 5, include.p = FALSE, include.test.name = TRUE, decimal = 2)
-  # descriptif(iris, 1:4, 5, include.p = FALSE, include.test.name = FALSE)
-  # descriptif(iris, 1:4, 5, include.p = TRUE, include.test.name = TRUE)
-  # descriptif(iris, 1:4, 5, include.p = TRUE, include.test.name = FALSE)
-  # descriptif(iris, 1:4, 5, include.p = FALSE, include.test.name = TRUE, merge.cols = FALSE)
-  # descriptif(iris, 1:4, 5, include.p = FALSE, include.test.name = FALSE, merge.cols = FALSE)
-  # descriptif(iris, 1:4, 5, include.p = TRUE, include.test.name = TRUE, merge.cols = FALSE)
-  # descriptif(iris, 1:4, 5, include.p = TRUE, include.test.name = FALSE, merge.cols = FALSE)
-
-
-
-
-#### Test avec espaces dans les modalites de Y ####
-  # iris2 <- iris
-  # levels(iris2$Species) <- c("Se tosa", "versi color", "virgini ca")
-  # descriptif(iris2, 1:4, 5, include.p = FALSE, include.test.name = TRUE)
-  # descriptif(iris2, 1:4, 5, include.p = FALSE, include.test.name = FALSE)
-  # descriptif(iris2, 1:4, 5, include.p = TRUE, include.test.name = TRUE)
-  # descriptif(iris2, 1:4, 5, include.p = TRUE, include.test.name = FALSE)
-  # descriptif(iris2, 1:4, 5, include.p = FALSE, include.test.name = TRUE, merge.cols = FALSE)
-  # descriptif(iris2, 1:4, 5, include.p = FALSE, include.test.name = FALSE, merge.cols = FALSE)
-  # descriptif(iris2, 1:4, 5, include.p = TRUE, include.test.name = TRUE, merge.cols = FALSE)
-  # descriptif(iris, 1:4, 5, include.p = TRUE, include.test.name = FALSE, merge.cols = FALSE)
-
-
-#### Test label avec repetition ####
-  # descriptif(iris, 1:4, 5, label = rep("lab", 4))
-
-
-#### Tests prop.type = "tot.percent" ####
-  # descriptif(carData::BEPS, "vote", "gender", prop.type = "tot.percent")
-  #
-  # BEPS2 <- carData::BEPS
-  # BEPS2$economic.cond.national <- as.factor(BEPS2$economic.cond.national)
-  # BEPS2$economic.cond.household <- as.factor(BEPS2$economic.cond.household)
-  # descriptif(BEPS2,
-  #            c("gender", "economic.cond.national", "economic.cond.household"), "vote",
-  #            prop.type = "tot.percent")
-
-
-#### Test num.type = "med" ####
-  # descriptif(iris, 1:4, 5, num.type = "med") # OK
-  # descriptif(iris[97:150,], 1:4, 5, num.type = "med") # bug -> pas assez de virginica
-  # descriptif(iris[1:105,], 1:4, 5, num.type = "med")
-  # descriptif(iris[47:150,], 1:4, 5, num.type = "med")
-
-#### Test na.omit = FALSE ####
-  # BEPS3 <- carData::BEPS
-  # BEPS3$vote[c(12, 15, 45, 49, 76, 145, 146, 147, 178, 209, 375, 400)] <- NA
-  # descriptif(BEPS3, c("vote", "age"), "gender")
-  # BEPS3$age[1000:1200] <- NA
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE)
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, lang = "en")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.str.default = "missing")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.str.default = "mode")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.str.default = "value")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.str.default = "value", na.str.value = "Pouet")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.num.default = "none")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.num.default = "mean")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.num.default = "med")
-  # descriptif(BEPS3, c("vote", "age"), "gender", na.omit = FALSE, na.num.default = "value", na.num.value = 18)
-
-#### Test arguments manquants ####
-  # descriptif()
-  # descriptif(data = iris)
-  # descriptif(data = iris, factor = 4:5, vars = 1:3)
-  # descriptif(data = iris, factor = 5, vars = 1:4, label = "test")
-  # descriptif(data = iris, factor = 5, vars = c("Sepal.Length", "Sepal.Width", "Petal.Length", "test"))
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.num.value = 3)
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.str.value = 3)
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.num.default = "value")
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.str.default = "value")
-  # descriptif(data = iris, factor = 5, vars = 1:4, prop.type = "erreur")
-  # descriptif(data = iris, factor = 5, vars = 1:4, conf.method = "erreur")
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.str.default = "erreur")
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.num.default = "erreur")
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.num.default = "mean")
-  # descriptif(data = iris, factor = 5, vars = 1:4, na.str.default = "mode")
-
-#### Test univarie ####
-  # descriptif(data = iris, vars = 1:4)
-  # descriptif(data = iris, vars = 1:4, factor = 5)
-  # descriptif(data = iris, vars = 1:4, merge.cols = FALSE)
-  # descriptif(iris)
-
-#### Test include.range ####
-  # descriptif(iris)
-  # descriptif(iris, include.range = TRUE)
-  # descriptif(iris, include.range = TRUE, merge.cols = FALSE)
-  # descriptif(iris, factor = "Species")
-  # descriptif(iris, factor = "Species", include.range = TRUE)
-  # descriptif(iris, factor = "Species", include.range = TRUE, merge.cols = FALSE)
-
-#### Tests de temps de calcul ####
-# Avant passage en matrice de res1
-# T = 36.11, 37.84
-# system.time({
-#   for (i in 1L:100L) {
-#     descriptif(carData::BEPS, factor = "gender")
-#   }
-# })
-
-# Après avoir enlever les pipes dans la mise en page
-# T = 8.97, 8.75, 8.77
-# system.time({
-#   for (i in 1L:100L) {
-#     descriptif(carData::BEPS, factor = "gender")
-#   }
-# })
-
-# Après avoir enlever les pipes dans le map
-# T = 8.97, 8.75, 8.77
-# system.time({
-#   for (i in 1L:100L) {
-#     descriptif(carData::BEPS, factor = "gender")
-#   }
-# })
-
-# Après avoir enlever TOUS LES PIPES
-# T = 4.32, 4.26, 3.83
-# system.time({
-#   for (i in 1L:100L) {
-#     descriptif(carData::BEPS, factor = "gender")
-#   }
-# })
