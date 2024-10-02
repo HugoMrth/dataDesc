@@ -957,7 +957,7 @@ switch(mean.test, # Choix du test sur la moyenne
   res <- unite(bind_rows(res), # Fusion des descriptifs de chaque variable
                "Total n (%)", c("n", "p"), sep = " ") #Fusion des effectifs et pourcentages
 
-  for (jj in levels(data[, factor])) { # Renommage des colonnes de la sortie
+  for (jj in levels(as.factor(pull(data[, factor])))) { # Renommage des colonnes de la sortie
     res <-  unite(res, "col.to.change", c(paste0(jj, "_n"), paste0(jj, "_p")), sep = " ")
     colnames(res)[str_detect(colnames(res), "col.to.change")] <- paste0(jj, " n (%)")
   }
