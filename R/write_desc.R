@@ -1,4 +1,4 @@
-write.descriptif <- function(desc,
+write.desc <- function(desc,
                       file,
                        columnsBorders = TRUE,
                        boldLabels = TRUE,
