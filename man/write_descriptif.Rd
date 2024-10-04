@@ -1,12 +1,12 @@
 \title{
   Impression xlsx de descriptifs
 }
-\name{write_descriptif}
-\alias{write.descriptif}
+\name{write_desc}
+\alias{write.desc}
 \description{
   Ecriture en format .xlsx, avec mise en page adaptée, d'un objet de type desc.univar ou desc.bivar.
 }\usage{
-  write.descritif(desc,
+  write.desc(desc,
              file,
              columnsBorders = TRUE,
              boldLabels = TRUE,
@@ -37,7 +37,7 @@
   Hugo Marthinet
 }
 \seealso{
-  \code{\link{descriptif}}
+  \code{\link{describe}}
 }\examples{
 
 }
