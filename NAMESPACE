@@ -1,6 +1,7 @@
 export(FAIR)
 export(describe)
 export(tidyDesc_binary)
+export(tidyDesc_censorLowFreq)
 export(write.desc)
 
 
