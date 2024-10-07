@@ -185,7 +185,7 @@ describe <- function(# Arguments de base
     #Calcul de l'IC et de la mediane
     r <- switch(match.arg(arg = conf.method.num, choices = c("classic", "boot")),
                 classic = test_binom_med(x, conf.level = conf.level)$conf.int,  # Si methode de calcul classique
-                boot = boot.ci(boot::boot(x, function(x, d) median(x[d], na.rm = na.rm), R = R),
+                boot = boot::boot.ci(boot::boot(x, function(x, d) median(x[d], na.rm = na.rm), R = R),
                                conf = conf.level, type = "basic")[[4]][4:5]) # Si calcul par bootstrap
     med <- median(x, na.rm = na.rm)
 
@@ -279,7 +279,7 @@ describe <- function(# Arguments de base
                }, R = InDots(..., arg = "R", default = 999), parallel = InDots(..., arg = "parallel", default = "no"))
              }
 
-             ci <- boot.ci(boot.fun, conf = conf.level, type = btype)
+             ci <- boot::boot.ci(boot.fun, conf = conf.level, type = btype)
              if (btype == "norm") {
                return(c(mean = boot.fun$t0[1], lwr.ci = ci[[4]][2], upr.ci = ci[[4]][3]))
              } else {
@@ -405,7 +405,7 @@ describe <- function(# Arguments de base
              dt <- rep(names(x), times = x)
 
              getCI <- function(x,w) {
-               b1 <- boot.ci( x , index = w , conf = conf.level , type = "basic")
+               b1 <- boot::boot.ci( x , index = w , conf = conf.level , type = "basic")
                ## extract info for all CI types
                tab <- t(sapply(b1[-(1:3)],function(x) tail(c(x),2)))
                ## combine with metadata: CI method, index
@@ -957,9 +957,16 @@ switch(mean.test, # Choix du test sur la moyenne
   res <- unite(bind_rows(res), # Fusion des descriptifs de chaque variable
                "Total n (%)", c("n", "p"), sep = " ") #Fusion des effectifs et pourcentages
 
-  for (jj in levels(as.factor(pull(data[, factor])))) { # Renommage des colonnes de la sortie
-    res <-  unite(res, "col.to.change", c(paste0(jj, "_n"), paste0(jj, "_p")), sep = " ")
-    colnames(res)[str_detect(colnames(res), "col.to.change")] <- paste0(jj, " n (%)")
+  if (is.factor(data[, factor])) {
+    for (jj in levels(as.factor(data[, factor]))) { # Renommage des colonnes de la sortie
+      res <-  unite(res, "col.to.change", c(paste0(jj, "_n"), paste0(jj, "_p")), sep = " ")
+      colnames(res)[str_detect(colnames(res), "col.to.change")] <- paste0(jj, " n (%)")
+    }
+  } else {
+    for (jj in levels(as.factor(pull(data[, factor])))) { # Renommage des colonnes de la sortie
+      res <-  unite(res, "col.to.change", c(paste0(jj, "_n"), paste0(jj, "_p")), sep = " ")
+      colnames(res)[str_detect(colnames(res), "col.to.change")] <- paste0(jj, " n (%)")
+    }
   }
 
   # Conversion en matrice
