@@ -2,9 +2,12 @@ createSankeyData <- function(data,
                              states,
                              timesColumns) {
   data <- as.data.frame(data)
-  
   n_states <- length(states)
   n_times <- length(timesColumns)
+  for (i in 1:n_times) {
+    data[, timesColumns[i]] <- factor(data[, timesColumns[i]], levels = states)
+  }
+  
   nodesCols <- c("#AAC0AF", "#B28B84", "#1C4073", "#0f766e", "#653239", "#472C1B", "#5C2751")[1:n_states]
   linksCols <- c("#D0DCD3", "#D0B8B4", "#285CA4", "#17B5A7", "#964A54", "#76492D", "#8F3D7E")[1:n_states]
   
