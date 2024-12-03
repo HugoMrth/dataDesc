@@ -1,4 +1,4 @@
-plotSankey <- function(Nodes, Links) {
+plotSankey <- function(Nodes, Links, add.prop = FALSE) {
 
   if (add.prop) {
     if(all(table(Links$source) == table(Links$source)[1])) {
