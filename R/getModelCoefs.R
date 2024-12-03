@@ -6,8 +6,8 @@ getModelCoefs <- function(
     merge_p = TRUE
     ) {
   
-  coefficients <- summary(model)$coefficients[, "Estimate"]
-  se <- summary(model)$coefficients[, "Std.err"]
+  coefficients <- summary(model)$coefficients[, 1]
+  se <- summary(model)$coefficients[, 2]
   
   if (merge_p) {
     res <- data.frame(
