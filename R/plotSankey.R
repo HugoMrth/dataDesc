@@ -1,4 +1,28 @@
 plotSankey <- function(Nodes, Links) {
+
+  if (add.prop) {
+    if(all(table(Links$source) == table(Links$source)[1])) {
+      nrow_per_times <- table(Links$source)[1]^2
+      n_times <- nrow(Links)/nrow_per_times
+      for (i in 1:n_times) {
+        tab <- Links[((i-1)*nrow_per_times+1):((i-1)*nrow_per_times+nrow_per_times), ]
+        vals <- as.numeric(by(tab$value, tab$target, sum))
+        Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"] <- paste0(
+          Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"], " (",
+          formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)")
+        
+        if (i == 1) {
+          vals <- as.numeric(by(tab$value, tab$source, sum))
+          Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"] <- paste0(
+            Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"], " (",
+            formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)")
+        }
+      }
+    } else {
+      warning("Links arg does not have equal number of each source and function cannot automatically calculate proportions.")
+    }
+  }
+  
   # Adding transparency to the links
   # Conversion to rgba character string
   Links$color <- apply(grDevices::col2rgb(Links$color), 2, function(x) {
