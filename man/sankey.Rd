@@ -11,14 +11,13 @@
                    states,
                    timesColumns)
 
-  plotSankey(Nodes, Links)
+  plotSankey(Nodes, Links, add.prop = FALSE)
 }\arguments{
   \item{data}{
   Dataset providing the data.
 }
   \item{states}{
   Vector of the states to consider. This must contain every possible states.
-
 }
   \item{timesColumns}{
   Names of the states variables at the different times. This must be provided in chronological order.
@@ -30,6 +29,9 @@
 }
   \item{Links}{
   Second element of the \code{createSankeyData()} output. Provides data to draw the Links of the Sankey plot.
+}
+  \item{add.prop}{
+  Adds proportions next to the states labels. Proportions are calculated over each time.
 }
 }\value{
   A list of nodes and links required to draw a Sankey plot in \code{plotly}, and a plotly object.
