@@ -7,6 +7,8 @@ getModelCoefs <- function(
   merge_p = TRUE
 ) {
   
+  if(!merge_CI & merge_p) warning("Confidence intervals will only be unmerged if 'merge_p = FALSE'")
+  
   coefficients <- summary(model)$coefficients[, 1]
   se <- summary(model)$coefficients[, 2]
   
