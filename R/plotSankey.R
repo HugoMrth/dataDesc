@@ -9,23 +9,22 @@ plotSankey <- function(Nodes, Links,
       for (i in 1:n_times) {
         tab <- Links[((i-1)*nrow_per_times+1):((i-1)*nrow_per_times+nrow_per_times), ]
         vals <- as.numeric(by(tab$value, tab$target, sum))
-        Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"] <- 
           ifelse(addLab == "p",
-                 paste0(
+                 Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"] <- paste0(
                    Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"], " (",
                    formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)"),
-                 paste0(
+                 Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"] <- paste0(
                    Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"], " (N=",
                    formatC(vals, digits = 0, format = "f", big.mark = " "), ")"))
         
         if (i == 1) {
           vals <- as.numeric(by(tab$value, tab$source, sum))
-          Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"] <- 
+           
             ifelse(addLab == "p",
-                   paste0(
+                   Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"] <-paste0(
                      Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"], " (",
                      formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)"),
-                   paste0(
+                   Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"] <-paste0(
                      Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"], " (N=",
                      formatC(vals, digits = 0, format = "f", big.mark = " "), ")"))
         }
@@ -59,6 +58,6 @@ plotSankey <- function(Nodes, Links,
         color = Links$color
       )
     )
-  fig <- fig %>% layout(font = list(size = 14, color = "black", weight = "bold"))
+  fig <- fig %>% layout(font = list(size = 16, color = "black", weight = "bold"))
   fig
 }
