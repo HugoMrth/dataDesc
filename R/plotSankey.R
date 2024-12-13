@@ -1,21 +1,33 @@
-plotSankey <- function(Nodes, Links, add.prop = FALSE) {
+plotSankey <- function(Nodes, Links, 
+                       addLab = c("none", "n", "p")) {
+  addLab <- match.arg(addLab, c("none", "n", "p"))
 
-  if (add.prop) {
+  if (addLab != "none") {
     if(all(table(Links$source) == table(Links$source)[1])) {
       nrow_per_times <- table(Links$source)[1]^2
       n_times <- nrow(Links)/nrow_per_times
       for (i in 1:n_times) {
         tab <- Links[((i-1)*nrow_per_times+1):((i-1)*nrow_per_times+nrow_per_times), ]
         vals <- as.numeric(by(tab$value, tab$target, sum))
-        Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"] <- paste0(
-          Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"], " (",
-          formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)")
+        Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"] <- 
+          ifelse(addLab == "p",
+                 paste0(
+                   Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"], " (",
+                   formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)"),
+                 paste0(
+                   Nodes[Nodes$X %in% (unique(tab$target) + 1), "label"], " (N=",
+                   formatC(vals, digits = 0, format = "f", big.mark = " "), ")"))
         
         if (i == 1) {
           vals <- as.numeric(by(tab$value, tab$source, sum))
-          Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"] <- paste0(
-            Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"], " (",
-            formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)")
+          Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"] <- 
+            ifelse(addLab == "p",
+                   paste0(
+                     Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"], " (",
+                     formatC(vals/sum(vals)*100, digits = 1, format = 'f'), "%)"),
+                   paste0(
+                     Nodes[Nodes$X %in% (unique(tab$source) + 1), "label"], " (N=",
+                     formatC(vals, digits = 0, format = "f", big.mark = " "), ")"))
         }
       }
     } else {
