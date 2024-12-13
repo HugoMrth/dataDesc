@@ -12,7 +12,8 @@
     coefs_digits = 2,
     p_digits = 3,
     p_threshold = 0.001,
-    merge_p = TRUE
+    merge_p = TRUE,
+    merge_CI = TRUE
     ) 
 }\arguments{
   \item{model}{
@@ -20,7 +21,7 @@
     the estimate, estimate standard error, statistic value and p-value of the statistic.
 }
  \item{coefs_digits}{
- Number of digits to include for the coefficient and confidence interval.
+ Number of digits to include for the coefficients and confidence intervals.
 }
    \item{p_digits}{
  Number of digits to include for the p-value.
@@ -29,7 +30,10 @@
  Threshold under wich the p-value will be replaced by \code{<0.001} for instance.
 }
    \item{merge_p}{
- Whether or not to merge de coefficient an p-value columns into one.
+ Whether or not to merge the coefficients and p-values columns into one. 
+}
+   \item{merge_CI}{
+ Whether or not to merge the coefficients and confidence intervals columns into one. This is only effective if \code{merge_p = FALSE}.
 }
 }\value{
   A data frame of 2 or 3 columns depending on \code{merge_p} and as many rows and the model coefficient minus one (excluding the intercept).
