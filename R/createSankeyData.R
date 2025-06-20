@@ -1,6 +1,7 @@
 createSankeyData <- function(data,
-                             states,
-                             timesColumns) {
+                                  states,
+                                  timesColumns,
+                                  autoNodesCoord = FALSE) {
   data <- as.data.frame(data)
   n_states <- length(states)
   n_times <- length(timesColumns)
@@ -18,8 +19,8 @@ createSankeyData <- function(data,
       vals <- c(vals, table(data[, timesColumns[i]][data[, timesColumns[i-1]] == states[j]]))
     }
   }
-
-  dataSankeyTem <- list(
+  
+  dataSankey <- list(
     Nodes = data.frame(
       label = rep(states, n_times),
       color = rep(nodesCols, n_times)
@@ -30,4 +31,36 @@ createSankeyData <- function(data,
       value = vals,
       color = rep(rep(linksCols, each = n_states), n_times-1)
     ))
+  
+  # Calculating Nodes Coordinates
+  if (!autoNodesCoord) {
+    if (length(timesColumns) == 2) {
+      dataSankey$Nodes$x <- rep(c(0.0001, 0.98), each = n_states)
+    } else {
+      dataSankey$Nodes$x <- rep(c(0.0001, (1:(n_times-2))/(n_times-1), 0.98), each = n_states)
+    }
+    
+    t1 <- dataSankey$Links %>%
+      group_by(source) %>%
+      summarise(n = sum(value))
+    t2 <- dataSankey$Links %>%
+      group_by(target) %>%
+      summarise(n = sum(value))
+    colnames(t2) <- colnames(t1)
+    t3 <- rbind(t1, t2[!(t2$source %in% t1$source),]) %>%
+      mutate(group = rep(1:(n_times), each = n_states))
+    y <- c()
+    for (i in 1:n_times) {
+      for (j in 1:n_states) {
+        if (j == 1) {
+          y <- c(y, (t3$n[t3$group == i][1]/2)/sum(t3$n[t3$group == i]))
+        } else {
+          y <- c(y, sum(t3$n[t3$group == i][1:(j-1)])/sum(t3$n[t3$group == i]) +
+                   (t3$n[t3$group == i][j]/2)/sum(t3$n[t3$group == i]))
+        }
+      }
+    }
+    dataSankey$Nodes$y <- y
+  }
+  return(dataSankey)
 }
