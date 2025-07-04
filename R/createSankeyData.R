@@ -61,6 +61,26 @@ createSankeyData <- function(data,
       }
     }
     dataSankey$Nodes$y <- y
+    
+    noLink <- dataSankey$Links %>%
+      group_by(target) %>%
+      summarise(n = sum(value))
+    dataSankey$Links <- dataSankey$Links[dataSankey$Links$value != 0,]
+    dataSankey$Nodes <- dataSankey$Nodes[-(noLink$target[noLink$n == 0]+1), ]
+    dataSankey$Nodes <- dataSankey$Nodes[dataSankey$Nodes$y != 1,]
+    
+    ids <- as.numeric(rownames(dataSankey$Nodes))-1
+    dataSankey$Links$source <- dataSankey$Links$source -
+      rowSums(sapply(which(!(1:max(ids) %in% ids)),
+                     function(x) {
+                       dataSankey$Links$source > x
+                     }))
+    dataSankey$Links$target <- dataSankey$Links$target -
+      rowSums(sapply(which(!(1:max(ids) %in% ids)),
+                     function(x) {
+                       dataSankey$Links$target > x
+                     }))
+    rownames(dataSankey$Nodes) <- 1:nrow(dataSankey$Nodes)-1
   }
   return(dataSankey)
 }
