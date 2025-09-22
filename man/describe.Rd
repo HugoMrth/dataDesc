@@ -20,7 +20,7 @@
 
             # Quantitative variables
             prop.type = c("col.percent", "row.percent", "tot.percent"),
-            prop.test = c("test", "chi", "fisher"),
+            prop.test = c("test", "chi", "fisher", "mcnemar"),
             chi.correct = FALSE,
             simulate.p.value = FALSE,
 
@@ -96,8 +96,8 @@ and a grand total of a 100percent.
 }
   \item{prop.test}{
 Choice of which proportion test to use. Default method is \code{prop.test = "test"} which will first try to run 
-a Chi-2 test and go onto a Fisher test if the Chi-2 does not converge. Other options are \code{prop.test = "chi"} and \code{prop.test = "fisher"}
-to force either of of the two.
+a Chi-2 test and go onto a Fisher test if the Chi-2 does not converge. Other options are \code{prop.test = "chi"}, \code{prop.test = "fisher"} and \code{prop.test = "mcnemar"}
+to force one of the three.
 }
   \item{chi.correct}{
 Enable the \code{correct} argument of the \code{chisq.test} function. Default is \code{chi.correct = TRUE} as in the original method.
@@ -232,3 +232,4 @@ but the variable has to be a factor with the levels being assigned accordingly. 
            cut.pvalue = 0.0001,
            p.adjust = TRUE, p.adjust.method = "bonferroni")
 }
+
