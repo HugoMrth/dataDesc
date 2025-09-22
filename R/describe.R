@@ -10,7 +10,7 @@ describe <- function(# Arguments de base
   conf.method.num = c("classic", "boot"),
   # Variables quanti
   prop.type = c("col.percent", "row.percent", "tot.percent"),
-  prop.test = c("test", "chi", "fisher"),
+  prop.test = c("test", "chi", "fisher", "mcnemar"),
   chi.correct = TRUE,
   simulate.p.value = FALSE,
   # Variables quali
@@ -42,20 +42,20 @@ describe <- function(# Arguments de base
   lang = c("fr", "en"),
   merge.cols = TRUE,
   big.mark = NULL) {
-
+  
   options(warn = 1) # Warnings on
-
+  
   # Rétro-compatibilité
   # if ("conf.method" %in% names(list(...)) ) {
   #   conf.method.cat <- InDots(..., arg = "conf.method")
   # }
-
+  
   # Matching des arguments proposant une liste d'options
   # Retourne une erreur si l'argument renseigne n'est pas dans la liste
   # Et le prmier de la liste s'il n'est pas renseigne
   num.type <- match.arg(num.type, choices = c("mean", "both", "med"))
   prop.type <- match.arg(prop.type, choices = c("col.percent", "row.percent", "tot.percent"))
-  prop.test <- match.arg(prop.test, choices = c("test", "chi", "fisher"))
+  prop.test <- match.arg(prop.test, choices = c("test", "chi", "fisher", "mcnemar"))
   mean.test <- match.arg(mean.test, choices = c("test", "student", "kruskal"))
   conf.method.cat <- match.arg(conf.method.cat, choices = c("waldcc", "sisonglaz", "cplus1", "goodman", "wald", "wilson","boot"))
   conf.method.num <- match.arg(conf.method.num, choices = c("classic","boot"))
@@ -63,14 +63,14 @@ describe <- function(# Arguments de base
   na.str.default <- match.arg(na.str.default, choices = c("missing", "mode", "value"))
   p.adjust.method <- match.arg(p.adjust.method, choices = c("BH", "holm", "hochberg", "hommel", "bonferroni", "BY", "fdr", "none"))
   lang <- match.arg(lang, choices = c("fr", "en"))
-
-  #### Check Params ####
-
+  
+  #### Check Params 
+  
   # Recuperation des noms de colonnes si les indices sont numeriques
   if (is.numeric(factor))   factor <- colnames(data)[factor]
   if (is.numeric(vars))        vars <- colnames(data)[vars]
   if (is.numeric(weights))     weights <- colnames(data)[weights]
-
+  
   # Stops si parametres non appropries
   if (is.null(data)) stop("argument 'data' is missing, with no default")
   if (!is.data.frame(data)) stop("'data' must be a data.frame or a tibble")
@@ -119,7 +119,7 @@ describe <- function(# Arguments de base
         stop("'pop.ref' must contains ", (2 + length(table(data[, factor]))), " columns : variable name, level name and one denominator column per factor level")
     }
   }
-
+  
   if (na.str.default == "value" & is.null(na.str.value)) stop("na.str.default = 'value' requires na.str.value to be defined")
   if (na.num.default == "value" & is.null(na.num.value)) stop("na.num.default = 'value' requires na.num.value to be defined")
   if (na.str.default != "value" & !is.null(na.str.value)) warning("'na.str.value' only used when na.str.default = 'value' and will be ignored")
@@ -127,7 +127,7 @@ describe <- function(# Arguments de base
   if (na.omit & na.str.default != "missing") warning("'na.omit = TRUE' and na.str.default will be ignored")
   if (na.omit & na.num.default != "none") warning("'na.omit = TRUE' and na.num.default will be ignored")
   if (p.adjust.method != "BH" & !p.adjust) warning("'p.adjust.method' only used when p.adjust = TRUE and will be ignored")
-
+  
   # Attribution de valeurs par defaut aux parametres binaires
   if (!is.numeric(conf.level) || conf.level < 0 || conf.level > 1) {
     warning("conf.level must be between 0 and 1, default value is assigned : conf.level <- 0.95")
@@ -166,29 +166,29 @@ describe <- function(# Arguments de base
   if (include.test.name %ni% c(TRUE, FALSE)) {
     warning("include.test.name must be logical (TRUE, FALSE), default value is assigned : include.test.name <- FALSE")
     include.test.name <- FALSE}
-
+  
   # Conversion en entier des params
   decimal <- as.integer(decimal)
   p.decimal <- as.integer(p.decimal)
-
-  #### Definition des fonctions IC ####
-
+  
+  #### Definition des fonctions IC 
+  
   # Fonctions de calculs d'intervalles de confiance pour la moyenne, mediane, et pourcentage
   # Ces fonctions sont utilises dans les fonctions de creation de tableaux descriptifs : tab.res.moy, tab.res.med et tab.res.fac
-
+  
   # Fonction de calcul d'intervalle de confiance pour la mediane
   IC_med <- function(x, conf.level = 0.95, sides = c("two.sided", "left", "right"), na.rm = TRUE, conf.method.num = c("classic", "boot"), R = 999) {
     # Gestion/Matching des arguments
     sides <- match.arg(sides, choices = c("two.sided", "left", "right"), several.ok = FALSE)
     if (sides != "two.sided") conf.level <- 1 - 2 * (1 - conf.level) # Ajustement du alpha si hypothese bilaterale
-
+    
     #Calcul de l'IC et de la mediane
     r <- switch(match.arg(arg = conf.method.num, choices = c("classic", "boot")),
                 classic = test_binom_med(x, conf.level = conf.level)$conf.int,  # Si methode de calcul classique
-                boot = boot::boot.ci(boot::boot(x, function(x, d) median(x[d], na.rm = na.rm), R = R),
+                boot = boot.ci(boot::boot(x, function(x, d) median(x[d], na.rm = na.rm), R = R),
                                conf = conf.level, type = "basic")[[4]][4:5]) # Si calcul par bootstrap
     med <- median(x, na.rm = na.rm)
-
+    
     if (is.na(med)) { # Si mediane = NA
       r2 <- rep(NA, 3) # Mediane, IC inf et IC sup a NA
     } else { # Sinon
@@ -199,13 +199,13 @@ describe <- function(# Arguments de base
       }
     }
     names(r2) <- c("median", "lwr.ci", "upr.ci")
-
+    
     switch(sides, # Ajustement des bornes dans les hypotheses bilaterales
            left = {r2[3] <- Inf},
            right = {r2[2] <- -Inf})
     return(r2)
   }
-
+  
   IC_med_binom <- function(x, conf.level = 0.95, alternative = c("two.sided", "greater", "less"), na.rm = TRUE) {
     if (na.rm) x <- na.omit(x)
     n <- length(x)
@@ -225,7 +225,7 @@ describe <- function(# Arguments de base
            })
     return(ci)
   }
-
+  
   # Fonction de calcul d'IC pour une moyenne
   IC_moy <- function(x, sd = NULL, trim = 0, conf.level = 0.95, sides = c("two.sided", "left", "right"), na.rm = TRUE , conf.method.num = c("classic", "boot"),...) {
     winvar <- function(x, trim) {
@@ -242,7 +242,7 @@ describe <- function(# Arguments de base
     conf.method.num <- match.arg(conf.method.num, choices=c("classic", "boot"))
     if (sides != "two.sided") conf.level <- 1 - 2 * (1 - conf.level)
     if (na.rm) x <- na.omit(x)
-
+    
     switch(conf.method.num,
            classic = {
              if (trim != 0) {
@@ -278,21 +278,21 @@ describe <- function(# Arguments de base
                  c(m, v)
                }, R = InDots(..., arg = "R", default = 999), parallel = InDots(..., arg = "parallel", default = "no"))
              }
-
-             ci <- boot::boot.ci(boot.fun, conf = conf.level, type = btype)
+             
+             ci <- boot.ci(boot.fun, conf = conf.level, type = btype)
              if (btype == "norm") {
                return(c(mean = boot.fun$t0[1], lwr.ci = ci[[4]][2], upr.ci = ci[[4]][3]))
              } else {
                return(c(mean = boot.fun$t0[1], lwr.ci = ci[[4]][4], upr.ci = ci[[4]][5]))
              }
            })
-
+    
     switch(sides, # Ajustement des bornes dans les hypotheses bilaterales
            left = {r2[3] <- Inf},
            right = {r2[2] <- -Inf})
     return(res)
   }
-
+  
   IC_tab <- function(x, conf.level = 0.95, conf.method.cat = conf.method.cat) {
     .moments <- function(c, lambda) {
       a <- lambda + c
@@ -346,7 +346,7 @@ describe <- function(# Arguments de base
     n <- sum(x, na.rm = TRUE)
     k <- length(x)
     p <- x/n
-
+    
     conf.method.cat <- match.arg(arg = conf.method.cat, choices = c("waldcc", "sisonglaz", "cplus1", "goodman", "wald", "wilson","boot"))
     switch(conf.method.cat,
            goodman = {
@@ -403,9 +403,9 @@ describe <- function(# Arguments de base
            },
            boot = {
              dt <- rep(names(x), times = x)
-
+             
              getCI <- function(x,w) {
-               b1 <- boot::boot.ci( x , index = w , conf = conf.level , type = "basic")
+               b1 <- boot.ci( x , index = w , conf = conf.level , type = "basic")
                ## extract info for all CI types
                tab <- t(sapply(b1[-(1:3)],function(x) tail(c(x),2)))
                ## combine with metadata: CI method, index
@@ -413,7 +413,7 @@ describe <- function(# Arguments de base
                colnames(tab) <- c("index","method","lwr","upr")
                tab
              }
-
+             
              boot.out <- boot::boot( dt , function(.x,d){ (.x[d] %>% table/n)  }  , R = 999)
              if ( sum(x!=0) == 1) {
                res = tibble(est = x/n , lwr.ci= x/n, upr.ci = x/n)
@@ -427,10 +427,10 @@ describe <- function(# Arguments de base
     )
     return(res)
   }
-
+  
   test_binom_med <- function (x, y = NULL, conf.level = 0.95, alternative = c("two.sided", "greater", "less"), mu = 0L,  ...) {
     alternative <- match.arg(alternative, choices = c("two.sided", "greater", "less"), several.ok = FALSE)
-
+    
     if (!missing(mu) && ((length(mu) > 1) || !is.finite(mu)))
       stop("'mu' must be a single number")
     if (!((length(conf.level) == 1) && is.finite(conf.level) && (conf.level > 0L) && (conf.level < 1)))
@@ -475,12 +475,12 @@ describe <- function(# Arguments de base
     class(RVAL) <- "htest"
     return(RVAL)
   }
-
-  #### Definition des fonctions de tri croise ####
+  
+  #### Definition des fonctions de tri croise 
   # Creation de tableau de descriptifs pour une seule variable X
   # Trois fonctions, une pour les facteurs, et deux pour les quantitatives (moyenne et mediane)
   # Ces fonctions sont ensuite appelles dans un "map" pour etre appliquees sur toutes les variables X
-
+  
   # Tableau descriptifs pour la moyenne d'une variable quantitative
   tab.res.moy <- function(x, y, weights, conf.level, decimal, mean.test, include.p, conf.method.num = conf.method.num ){
     if (is.defined(weights)) {
@@ -489,7 +489,7 @@ describe <- function(# Arguments de base
     } else {
       temp3 <- length(na.omit(x))
     }
-
+    
     # Calcul sur l'ensemble de la colonnes
     temp1 <- formatC(round(IC_moy(x, conf.level = conf.level, conf.method.num = conf.method.num), decimal), digits = decimal, format = "f")
     temp4 <- data.frame(Var = ", mean (sd)",
@@ -501,7 +501,7 @@ describe <- function(# Arguments de base
                         stringsAsFactors = FALSE)
     temp4$N <- as.character(temp4$N)
     temp4$n <- as.character(temp4$n)
-
+    
     list.res <- list()
     for (kk in 1:nlevels(y)) { # Boucle sur chaque modalite de facteur
       aux1 <- x[which(y == levels(y)[kk])]
@@ -516,51 +516,51 @@ describe <- function(# Arguments de base
       list.res[[kk]] <- aux4
     }
     res <- bind_cols(list.res)
-
+    
     if (include.p) {
-switch(mean.test, # Choix du test sur la moyenne
-       test = { # Choix du test par algorithem
-         if (bartlett.test(x, y)$p.value >= 0.05 | is.na(bartlett.test(x, y)$p.value)) { # Si bartlett significatif
-           if (length(table(y)) == 2) {
-             p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
-             tn <- "Student"
-           } else {
-             p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
-             tn <- "Anova"
-           }
-         } else { # Si bartlett non significatif
-           p <- kruskal.test(x, y)$p.value
-           if (length(table(y)) == 2) {
-             tn <- "Wilcoxson"
-           } else {
-             tn <- "Kruskal-Wallis"
-           }
-         }
-       },
-       student = { # test de student
-         if (length(table(y)) == 2) {
-           p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
-           tn <- "Student"
-         } else {
-           p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
-           tn <- "Anova"
-         }
-       },
-       kruskal = { # Kruskal
-         p <- kruskal.test(x, y)$p.value
-         if (length(table(y)) == 2) {
-           tn <- "Wilcoxson"
-         } else {
-           tn <- "Kruskal-Wallis"
-         }
-       })
+      switch(mean.test, # Choix du test sur la moyenne
+             test = { # Choix du test par algorithem
+               if (bartlett.test(x, y)$p.value >= 0.05 | is.na(bartlett.test(x, y)$p.value)) { # Si bartlett significatif
+                 if (length(table(y)) == 2) {
+                   p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
+                   tn <- "Student"
+                 } else {
+                   p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
+                   tn <- "Anova"
+                 }
+               } else { # Si bartlett non significatif
+                 p <- kruskal.test(x, y)$p.value
+                 if (length(table(y)) == 2) {
+                   tn <- "Wilcoxson"
+                 } else {
+                   tn <- "Kruskal-Wallis"
+                 }
+               }
+             },
+             student = { # test de student
+               if (length(table(y)) == 2) {
+                 p <- t.test(x ~ as.factor(y), var.equal = TRUE)$p.value
+                 tn <- "Student"
+               } else {
+                 p <- anova_test(data = data.frame(x = x, y = y), formula = x ~ y)$p
+                 tn <- "Anova"
+               }
+             },
+             kruskal = { # Kruskal
+               p <- kruskal.test(x, y)$p.value
+               if (length(table(y)) == 2) {
+                 tn <- "Wilcoxson"
+               } else {
+                 tn <- "Kruskal-Wallis"
+               }
+             })
     } else { # Si include.p = FALSE, pas de pval ni de test
       p <- "-"
       tn <- "-"
     }
     bind_cols(temp4, res, data.frame(pval = as.character(p)), data.frame(test = tn))
   }
-
+  
   # Tableau descriptifs pour la mediane d'une variable quantitative
   tab.res.med <- function(x, y, conf.level, decimal, include.p,...) {
     # Calcul pour toute la colonnes
@@ -575,7 +575,7 @@ switch(mean.test, # Choix du test sur la moyenne
                         stringsAsFactors = FALSE)
     temp4$N <- as.character(temp4$N)
     temp4$n <- as.character(temp4$n)
-
+    
     list.res <- list()
     for (kk in 1:nlevels(y)) { # Calcul par modalite du facteur
       aux1 <- x[which(y == levels(y)[kk])] # Sous echantillon
@@ -590,7 +590,7 @@ switch(mean.test, # Choix du test sur la moyenne
       list.res[[kk]] <- aux4
     }
     res <- bind_cols(list.res)
-
+    
     if (include.p) {
       p <- kruskal.test(x, y)$p.value
       if (length(table(y)) == 2) {tn <- "Wilcoxson"} else {tn <- "Kruskal-Wallis"}
@@ -600,7 +600,7 @@ switch(mean.test, # Choix du test sur la moyenne
     }
     bind_cols(temp4, res,data.frame(pval = as.character(p)), data.frame(test = tn))
   }
-
+  
   # Tableau descriptif pour une variable qualitative
   tab.res.fac <- function(weights, x, y, conf.level, conf.method.cat, decimal, simulate.p.value, chi.correct, prop.type, prop.test, include.p,...) {
     if (is.defined(weights)) {
@@ -613,7 +613,7 @@ switch(mean.test, # Choix du test sur la moyenne
       temp2 <- formatC(round((table(x)), decimal), digits = 0L, format = "f")
       temp3 <- length(na.omit(x))
     }
-
+    
     temp4 <- data.frame(Var = c("", paste0("  ", rownames(temp1))),
                         N = c(temp3, rep("", length(temp2))),
                         n = c("", temp2),
@@ -624,16 +624,16 @@ switch(mean.test, # Choix du test sur la moyenne
     rownames(temp4) <- NULL
     temp4$N <- as.character(temp4$N)
     temp4$n <- as.character(temp4$n)
-
+    
     if (is.defined(weights)) {
       aux1 <- as.data.frame(matrix(aggregate(w, list(x, y), sum)$x, ncol = length(table(y))))
     } else {
       aux1 <- table(x, y)
     }
-
+    
     colnames(aux1) <- names(table(y))
     rownames(aux1) <- names(table(x))
-
+    
     list.pourcent <- list() # Creation de la liste de sortie
     switch(prop.type, # Calcul des pourcentage
            "col.percent" = { # En colonnes
@@ -682,7 +682,7 @@ switch(mean.test, # Choix du test sur la moyenne
              colnames(aux0) <- paste0(rep(levels(y), each = 2), "_", c("p", "IC", "minmax"))
              p.ic <- bind_cols(aux0)
            })
-
+    
     aux11 <- as.data.frame.matrix(aux1, stringsAsFactors = FALSE) #Conversion du tableau de contingence en chaine de caracteres
     if (ncol(aux11) > 1) {
       aux11[, unlist(lapply(aux11, is.integer))] <- apply(aux11[, unlist(lapply(aux11, is.integer))], 2, as.character) # Conversion des entier
@@ -692,17 +692,17 @@ switch(mean.test, # Choix du test sur la moyenne
       aux11[, unlist(lapply(aux11, is.integer))] <- as.character(aux11[, unlist(lapply(aux11, is.integer))])
       aux11[, unlist(lapply(aux11, is.numeric))] <- as.character(aux11[, unlist(lapply(aux11, is.numeric))])
     }
-
-
+    
+    
     colnames(aux11) <- paste0(colnames(aux11), "_n") # Ajout du tag "_n"
     p.ic <- bind_cols(aux11, p.ic) # Concatenation u detail par modalite de facteur
-
+    
     ligne.vide <- data.frame(matrix(rep("", ncol(p.ic)), nrow = 1)) # création de la ligne vide d'entete
     colnames(ligne.vide) <- colnames(p.ic) # Correspondance des noms de colonnes pour la fusion
     ligne.vide[1, str_detect(colnames(ligne.vide), "_minmax")] <- # Pour les colonnes minmax
       paste0("{", apply(table(x, y), 2, function(x) {sum(x != 0L)}), " val}") # Decompte du nb de modalite par facteur
     p.ic <- bind_rows(ligne.vide, p.ic) # Fusion ligne vide et tableau de sortie
-
+    
     if (include.p) { # Tests sur le tableau de contingence
       switch(prop.test,
              "chi" = { # Test de Chi2
@@ -721,9 +721,17 @@ switch(mean.test, # Choix du test sur la moyenne
                }
                tn <- "Fisher" # Nom du test
              },
+             "mcnemar" = { # Test de fisher
+               test <- tryCatch(mcnemar.test(aux1), warning = function(w) w, error = function(e) e)
+               if (any(class(test) %in% c("error", "warning"))) { # Si erreur, pas de retour de test
+                 print(test$message)
+                 pvalue <- "-" # Fait pour empecher le crash de la fonction
+               }
+               tn <- "McNemar" # Nom du test
+             },
              "test" = { # Algo de decision de test
                test <- tryCatch(chisq.test(aux1, correct = chi.correct, simulate.p.value = simulate.p.value), warning = function(w) w, error = function(e) e) # On commence par un chi2
-               if (any(class(test) %in% c("error", "warning"))) { # Si le chi2 n'aboutit pas
+               if (any(class(test) %in% c("error", "warning")) | any(aux1 < 5)) { # Si le chi2 n'aboutit pas
                  test <- tryCatch(fisher.test(aux1, simulate.p.value = simulate.p.value), warning = function(w) w, error = function(e) e) # On fait un fisher
                  if (any(class(test) %in% c("error", "warning"))) { # Si fisher n'aboutit pas
                    print(test$message) # On ne retourne rien
@@ -745,8 +753,8 @@ switch(mean.test, # Choix du test sur la moyenne
               data.frame(pval = c(pvalue, rep("", nrow(temp4) - 1))),
               data.frame(test = c(tn, rep("", nrow(temp4) - 1))))
   }
-
-  #### Definition Fonction Map ####
+  
+  #### Definition Fonction Map 
   # Detection et gestion des types de la variables X en entree
   # Puis application des fonctions tab.res.moy, tab.res.med ou tab.res.fac selon le type de X et l'argument num.type
   # Cette fonction est ensuite appliquee dans un map a toutes les variables X
@@ -759,7 +767,7 @@ switch(mean.test, # Choix du test sur la moyenne
       vars <- data.temp$x
       w <- data.temp$w
     }
-
+    
     # Conversion des types
     y <- factor # Pour la variable facteur, conversion en factor
     if (is.vector(factor)) y <- as.factor(y)
@@ -767,7 +775,7 @@ switch(mean.test, # Choix du test sur la moyenne
     x <- vars # Pour la variable x
     if (is.difftime(x)) x <- as.numeric(x) # On traite les difftime comme des numeriques
     if (is.character(x)) x <- as.factor(x) # On traite les difftime comme des numeriques
-
+    
     # Gestion des valeurs manquantes
     if (!na.omit) { # Si na.omit = FALSE, on prend on compte les valeurs maquantes
       if (is.numeric(x)) { # Pour les variabes numerique
@@ -806,22 +814,22 @@ switch(mean.test, # Choix du test sur la moyenne
                          chi.correct = chi.correct, prop.type = prop.type, prop.test = prop.test, include.p = include.p))
     }
   }
-
-  # Code Fonction ----
+  
+  # Code Fonction -
   # Application de la fonciton de descrptif a toutes les variables X en utilisant un "map"
-
+  
   if (is.defined(weights)) {
     weights <- as.numeric(data[, weights])
   }
   if (is.defined(factor)) { # Si une variable stratifiante est renseignee
     data <- data[, unique(c(factor, vars))] # Sélection de variables
-
+    
     if (is.vector(data[, unlist(lapply(data, is.integer))])) data[, unlist(lapply(data, is.integer))] <- as.numeric(data[, unlist(lapply(data, is.integer))]) # Conversion des entier
     if (dim(data[, unlist(lapply(data, is.integer))])[2] > 1) data[, unlist(lapply(data, is.integer))] <- apply(data[, unlist(lapply(data, is.integer))], 2, as.numeric) # Conversion des entier
     if (is.vector(data[, unlist(lapply(data, is.character))])) data[, unlist(lapply(data, is.character))] <- as.factor(data[, unlist(lapply(data, is.character))]) # Conversion des strings
     if (dim(data[, unlist(lapply(data, is.character))])[2] > 1) data[, unlist(lapply(data, is.character))] <- apply(data[, unlist(lapply(data, is.character))], 2, as.factor) # Conversion des strings
-
-
+    
+    
     if (length(vars) == 1) { # Si une seule variable explicative, on lance la fonction une seule fois
       res <- list(tri_croise_map_fun(factor = data[, factor], vars = data[, vars], weights = weights, decimal = decimal, prop.type = prop.type, prop.test = prop.test,
                                      mean.test = mean.test, chi.correct = chi.correct, num.type = num.type, conf.level = conf.level, conf.method.num = conf.method.num, conf.method.cat=conf.method.cat,
@@ -846,22 +854,22 @@ switch(mean.test, # Choix du test sur la moyenne
     }
   } else { # Si pas de variable stratifiante, le descriptif est univarie
     data <- data[, vars] # Sélection de variables
-
+    
     if (is.vector(data[, unlist(lapply(data, is.integer))])) data[, unlist(lapply(data, is.integer))] <- as.numeric(data[, unlist(lapply(data, is.integer))]) # Conversion des entier
     if (dim(data[, unlist(lapply(data, is.integer))])[2] > 1) data[, unlist(lapply(data, is.integer))] <- apply(data[, unlist(lapply(data, is.integer))], 2, as.numeric) # Conversion des entier
     if (is.vector(data[, unlist(lapply(data, is.character))])) data[, unlist(lapply(data, is.character))] <- as.factor(data[, unlist(lapply(data, is.character))]) # Conversion des strings
     if (dim(data[, unlist(lapply(data, is.character))])[2] > 1) data[, unlist(lapply(data, is.character))] <- apply(data[, unlist(lapply(data, is.character))], 2, as.factor) # Conversion des strings
-
+    
     data[, "factor"] <- "Tout" # Creation d'une variable constante en substitut de factor
     factor <- "factor" # definition du parametre
-
+    
     res <- purrr::map(data[, vars], tri_croise_map_fun, factor = data[, factor], weights = weights, decimal = decimal, prop.type = prop.type,
                       chi.correct = FALSE, num.type = num.type, conf.level = conf.level, conf.method.cat = conf.method.cat, conf.method.num = conf.method.num,
                       simulate.p.value = FALSE, na.omit = na.omit, na.str.default = na.str.default, na.num.default = na.num.default,
                       na.str.value = na.str.value, na.num.value = na.num.value, include.p = include.p)
   }
-
-  # Ajout taux d'incidence ####
+  
+  # Ajout taux d'incidence 
   # Si factor == "factor" --> signifie que le descriptif est univarié, donc le traitement est fait une seule fois
   # Sinon, le même traitement est mis dans un boucle sur le nmobre de niveaux du facteur
   if (factor == "factor") {
@@ -923,18 +931,18 @@ switch(mean.test, # Choix du test sur la moyenne
       x
     })
   }
-
-  # Mise en page ####
+  
+  # Mise en page
   # Nommage des elements de la liste selon (label si dispo, noms de colonnes sinon)
   if (is.null(label)) {
     names(res) <- vars
   } else {
     names(res) <- label
   }
-
+  
   if (is.vector(data[, factor]))  data[, factor] <- as.factor(data[, factor]) # Conversion de la variable factor si besoin
   if (is.tbl(data[, factor]))  data[, factor] <- as.factor(pull(data[, factor])) # Idem
-
+  
   # Ordre des colonnes du tableau complet
   order.var <- c("Var", "N", "n", "p", "IC", "minmax", # Colonnes du descriptifs total
                  paste0(sort(factor(rep(names(table(data[, factor])), 6), # Colonnes par niveau de facteur
@@ -942,7 +950,7 @@ switch(mean.test, # Choix du test sur la moyenne
                         c("_n", "_p", "_IC", "_minmax", " TI", " TI_IC")),
                  "pval", "test")
   order.var <- unname(order.var)
-
+  
   # On met les 'labels' dans le tableau et on l'ordonne correctement
   for (i in 1:length(res)) {
     if (all(str_detect(res[[i]]$Var, "mean [(]sd[)]|med [(]iiq[)]"))) {
@@ -952,11 +960,11 @@ switch(mean.test, # Choix du test sur la moyenne
     }
     res[[i]] <- res[[i]][order.var[order.var %in% colnames(res[[i]])]]
   }
-
+  
   # Passage de "res" du format liste au format data.frame
   res <- unite(bind_rows(res), # Fusion des descriptifs de chaque variable
                "Total n (%)", c("n", "p"), sep = " ") #Fusion des effectifs et pourcentages
-
+  # browser()
   if (is.factor(data[, factor])) {
     for (jj in levels(as.factor(data[, factor]))) { # Renommage des colonnes de la sortie
       res <-  unite(res, "col.to.change", c(paste0(jj, "_n"), paste0(jj, "_p")), sep = " ")
@@ -968,7 +976,8 @@ switch(mean.test, # Choix du test sur la moyenne
       colnames(res)[str_detect(colnames(res), "col.to.change")] <- paste0(jj, " n (%)")
     }
   }
-
+  
+  
   # Conversion en matrice
   if (nrow(res) != 1) {
     res <- as.matrix(res)
@@ -976,8 +985,8 @@ switch(mean.test, # Choix du test sur la moyenne
     # Ou si cas particulier d'une seule ligne --> en data.frame pour ne pas perdre la dimension
     res <- as.data.frame(res)
   }
-
-  # Inclusion/Non inclusion des colonnes ####
+  
+  # Inclusion/Non inclusion des colonnes 
   # Suppression des IC
   if (!include.conf) {
     res <- res[, !(substr(colnames(res), nchar(colnames(res))-1, nchar(colnames(res))) == "IC")]
@@ -991,8 +1000,8 @@ switch(mean.test, # Choix du test sur la moyenne
     colnames(res)[substr(colnames(res), nchar(colnames(res))-5, nchar(colnames(res))) == "minmax"] <-
       c("Total minmax", paste(levels(data[, factor]), "minmax"))
   }
-
-
+  
+  
   # Gestion de la langue
   if (lang == "fr") { # Si descriptif en francais
     # Traduction et formatage des 'mean sd' et 'med iiq'
@@ -1008,8 +1017,8 @@ switch(mean.test, # Choix du test sur la moyenne
     colnames(res) <- str_replace(colnames(res), pattern = " IC", replacement = paste0(" CI ", conf.level*100L, "%"))
     colnames(res) <- str_replace(colnames(res), pattern = "_IC", replacement = paste0(" CI ", conf.level*100L, "%"))
   }
-
-
+  
+  
   # Gestion de la fusion/eclatage des colonnes avec l'argument merge.cols
   if (merge.cols) {
     # Gestion de la fusion des colonnes quand les IC ou les minmaxs sont inclus
@@ -1019,7 +1028,7 @@ switch(mean.test, # Choix du test sur la moyenne
       for (i in 1:length(ind_c)) { # Boucle sur les nombres de modalites + 1 (total)
         res[, ind_c[i]] <- paste(res[, ind_c[i]], res[, ind_c[i] + 1]) # Fusion des 2 colonnes
         if (ncol_suppr == 2) res[, ind_c[i]] <- paste(res[, ind_c[i]], res[, ind_c[i] + 2]) # Et une deuxième fois si besoin
-
+        
         if (include.conf) {
           if (lang == "fr") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[IC95%]") # Ajout dans le nom de colonnes
           if (lang == "en") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[CI95%]") # Ajout dans le nom de colonnes
@@ -1028,7 +1037,7 @@ switch(mean.test, # Choix du test sur la moyenne
       }
       res <- res[, -as.vector(sapply(ind_c, `+`, 1:ncol_suppr))] # Suppression des colonnes concatenees
     }
-
+    
     # Gestion de la fusion des colonnes d'IC quand les taux d'incidence sont calcules
     if (include.conf & is.defined(pop.ref)) {
       ncol_suppr <- which(str_detect(colnames(res), "TI IC|TI CI")) # Indices des colonnes d'IC a suppremier
@@ -1037,7 +1046,7 @@ switch(mean.test, # Choix du test sur la moyenne
         res[, ind_c[i]] <- paste(res[, ind_c[i]], res[, ind_c[i] + 1]) # Fusion des 2 colonnes
         if (lang == "fr") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[IC95% TI]") # Renommage de la colonne
         if (lang == "en") colnames(res)[ind_c[i]] <- paste(colnames(res)[ind_c[i]], "[CI95% TI]") # Renommage de la colonne
-
+        
       }
       res <- res[, -ncol_suppr] # Suppression des colonnes d'IC apres fusion
     }
@@ -1055,8 +1064,8 @@ switch(mean.test, # Choix du test sur la moyenne
     res <- as.data.frame(as.matrix(res)) # Retypage de la sortie
     colnames(res) <- substr(colnames(res), str_index(colnames(res), "\\.", "premiere") + 1, nchar(colnames(res)))
   }
-
-
+  
+  
   if (!include.p) { # Suppression de la colonnes des pvaleurs
     res <- res[, colnames(res) != "pval"] # Suppression de la p-valeur
   } else { # Ou ajustement
@@ -1072,8 +1081,8 @@ switch(mean.test, # Choix du test sur la moyenne
     # Remplacement dans la sortie
     res[res[, "pval"] != "", "pval"] <- new.pval
   }
-
-
+  
+  
   # Suppression de colonnes selon les argument binaire include...
   if (!include.tot) res <- res <- res[, !(substr(colnames(res), 1, 5) == "Total")] # Suppression du descriptif total
   if (!include.n) res <- res[, colnames(res) != "N"] # Suppresion du N total
@@ -1082,7 +1091,7 @@ switch(mean.test, # Choix du test sur la moyenne
   if (is.null(pop.ref)) res <- res[, !(str_detect(colnames(res), "TI IC 95"))]
   if (is.null(pop.ref)) res <- res[, !(str_detect(colnames(res), "TI CI 95"))]
   colnames(res) <- str_replace_all(colnames(res), "95% 95%", "95%")
-
+  
   if (!is.null(big.mark)) {
     res[, 2:ncol(res)] <- apply(res[, 2:ncol(res)], 2, function(x) {
       x <- str_replace_all(x, ",", ".")
@@ -1094,6 +1103,6 @@ switch(mean.test, # Choix du test sur la moyenne
       x <- str_replace_all(x, "\\.", ",")
     })
   }
-
+  
   return(as.data.frame(res))
 }
